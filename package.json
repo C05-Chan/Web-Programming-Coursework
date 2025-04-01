@@ -1,0 +1,25 @@
+{
+  "name": "web-application-coursework",
+  "version": "1.0.0",
+  "description": "Replace this text with an introduction to your key features.",
+  "main": "srvr.js",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "scripts": {
+    "test": "node --watch srvr.js",
+    "start": "node srvr.js",
+    "setup": "npm install express",
+    "config": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/C05-Chan/Web-Programming-Coursework.git"
+  },
+  "author": "Crystal Chan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/C05-Chan/Web-Programming-Coursework/issues"
+  },
+  "homepage": "https://github.com/C05-Chan/Web-Programming-Coursework#readme"
+}
