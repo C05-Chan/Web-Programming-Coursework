@@ -1,0 +1,119 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    /* background-color: lightblue; */
+}
+
+#header{
+    text-align: center;
+    font-size: 3vw;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;               
+    width: 100%;                 
+}
+
+/* Timer */
+.timer-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 50%;
+    margin-bottom: 2em;
+}
+
+#timer{
+    font-size: 3vw;
+    margin: 1em;
+}
+
+/* Buttons */
+.buttons-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em;
+}
+
+button{
+    font-size: 2vw;
+    padding: 0.5em 1em;
+    margin: 0.5em;
+    border: none;
+    width: 10em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#start{
+    background-color: green;
+    color: white;
+}
+#reset {
+    background-color: red;
+    color: white;
+}
+
+#lap{
+    background-color: orange;
+    color: white;
+}
+
+/* Table */
+.position-container {
+    width: 50%;
+}
+
+#position-times {
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: white;
+    
+}
+
+#position-times th:first-child, #position-times td:first-child {
+    text-align: left;
+}
+
+#position-times th:last-child, #position-times td:last-child {
+    text-align: right;
+}
+
+#position-times th, #position-times td {
+    padding: 8px 12px;
+}
+
+/* #pockground-color: #bfbfbf;
+} */
+
+/* Submit form */
+.submission-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 50%;
+    margin-bottom: 2em;
+}
+
+#submit-btn{
+    background-color: blue;
+    color: white;
+}
+
+/* Hide the content sections initially */
+#reset{
+    display: none;
+}
