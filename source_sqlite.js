@@ -1,5 +1,5 @@
-import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
 async function init() {
   const db = await open({
@@ -7,159 +7,178 @@ async function init() {
     driver: sqlite3.Database,
     verbose: true,
   });
-  await db.migrate({ migrationsPath: './migrations-sqlite' });
+
+  await db.migrate({
+    migrationsPath: './migrations-sqlite',
+  });
+
   return db;
 }
+
 const dbConn = init();
 
-function currentTime() {
-  return new Date().toISOString();
-}
 
+// Race Data //
 export async function addRaceData(type, data, id) {
-  if (!type || !data || !id) {
-    return { success: false, message: 'Not given all data to submit' };
+  if (!data) {
+    return { success: false, error: 'No data to be submitted' };
   }
 
   try {
     const db = await dbConn;
-    await db.run(
-      'INSERT INTO race_data (data_type, data_array, client_id, time) VALUES (?, ?, ?, ?)',
-      [type, JSON.stringify(data), id, currentTime()],
+
+    await db.run('INSERT INTO race_data (data_type, data_array, client_id, time) VALUES (?, ?, ?, datetime("now"))',
+      [type, JSON.stringify(data), id],
     );
 
-    const result = await getRaceData(type);
-    return { success: true, data: result.data };
+    console.log(`Successfully added ${type} data!`);
+    return { success: true, message: `Successfully added ${type} data!` };
   } catch (error) {
-    return { success: false, message: 'Failed to add race data' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: `Could not add ${type} data to database` };
   }
 }
 
-export async function editRaceResult(type, data, id) {
-  if (!type || !data || !id) {
-    return { success: false, message: 'Not given all data to submit' };
+export async function updateRaceData(type, data, id) {
+  if (data.length === 0) {
+    deleteRaceData(type, id);
   }
 
   try {
     const db = await dbConn;
-    const statement = await db.run(
-      'UPDATE race_data SET data_array = ?, time = ? WHERE client_id = ? AND data_type = ?',
-      [JSON.stringify(data), currentTime(), id, type],
+
+    await db.run('UPDATE race_data SET data_array = ? WHERE type = ? AND client_id = ?',
+      [JSON.stringify(data), type, id],
     );
 
-    if (statement.changes === 0) {
-      return { success: false, message: 'Race data not found' };
-    }
-
-    const result = await getRaceData(type);
-    return { success: true, data: result.data };
+    console.log(`Successfully updated ${type} data!`);
+    return { success: true, message: `Successfully updated ${type} data!` };
   } catch (error) {
-    return { success: false, message: 'Failed to update race data' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: `Could not update ${type} data.` };
   }
 }
 
 export async function getAllRaceData() {
   try {
     const db = await dbConn;
-    const results = await db.all('SELECT * FROM race_data ORDER BY time DESC');
 
-    const formattedResults = [];
-    results.forEach((row) => {
-      formattedResults.push({
+    const result = await db.all('SELECT * FROM race_data ORDER BY time');
+
+    const formattedData = [];
+
+    for (const row of result) {
+      formattedData.push({
         raceData_id: row.raceData_id,
         data_type: row.data_type,
         data_array: JSON.parse(row.data_array),
         client_id: row.client_id,
         time: row.time,
       });
-    });
-
-    return {
-      success: true,
-      data: formattedResults,
-    };
+    }
+    console.log('Successfully retrieved the data!');
+    return { success: true, data: formattedData };
   } catch (error) {
-    return { success: false, message: 'Failed to fetch race data' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: 'Could not retrieve the data.', data: [] };
   }
 }
 
-export async function getRaceData(type) {
+export async function getRaceData(type, id) {
   try {
     const db = await dbConn;
-    const results = await db.all(
-      'SELECT * FROM race_data WHERE data_type = ? ORDER BY time DESC',
-      [type],
+
+    const result = await db.all('SELECT * FROM race_data WHERE type = ? AND client_id = ?',
+      [type, id],
     );
 
-    const formattedResults = [];
-    results.forEach((row) => {
-      formattedResults.push({
-        ...row,
+    const formattedData = [];
+
+    for (const row of result) {
+      formattedData.push({
         data_array: JSON.parse(row.data_array),
       });
-    });
+    }
 
-    return {
-      success: true,
-      data: formattedResults,
-    };
+    console.log(`Successfully retrieve ${type} data!`);
+    return { success: true, data: formattedData };
   } catch (error) {
-    return { success: false, message: `Failed to fetch ${type} data` };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: `Could not retrieve the ${type} data.`, data: [] };
   }
 }
 
-export async function addRaceResult(timesArray, runnersArray) {
-  if (!timesArray || !runnersArray) {
-    return { success: false, message: 'Not given all data to submit' };
-  }
-
+async function deleteRaceData(type, id) {
   try {
     const db = await dbConn;
-    await db.run(
-      'INSERT OR REPLACE INTO race_results (id, times_array, runners_array, time) VALUES (1, ?, ?, ?)',
-      [JSON.stringify(timesArray), JSON.stringify(runnersArray), currentTime()],
+
+    await db.run('DELETE FROM race_data WHERE type = ? AND client_id = ?',
+      [type, id],
     );
 
-    const result = await getCurrentResults();
-    return { success: true, data: result.data };
+    console.log(`Successfully deleted ${id}'s ${type} data!`);
+    return { success: true, message: `Successfully deleted ${id}'s ${type} data!` };
   } catch (error) {
-    return { success: false, message: 'Failed to add race results' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: `Could not delete ${id}'s ${type} data!` };
   }
 }
 
-export async function getCurrentResults() {
+// Race Results //
+export async function addRaceResult(timesArray, runnersArray) {
   try {
     const db = await dbConn;
+
+    await db.run(
+      'INSERT OR REPLACE INTO race_results (id, times_array, runners_array, time) VALUES (1, ?, ?, datetime("now"))',
+      [JSON.stringify(timesArray), JSON.stringify(runnersArray)],
+    );
+
+    console.log('Created race results!');
+    return { success: true, message: 'Created race results!' };
+  } catch (error) {
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: 'Unable to create race results' };
+  }
+}
+
+export async function getRaceResults() {
+  try {
+    const db = await dbConn;
+
     const results = await db.get('SELECT * FROM race_results WHERE id = 1');
 
     if (!results) {
-      return { success: false, message: 'No race results found' };
+      console.log('No results!');
+      return { success: true, error: 'No results!', times: [], runners: [] };
     }
 
-    return {
-      success: true,
-      data: {
-        times: JSON.parse(results.times_array),
-        runners: JSON.parse(results.runners_array),
-      },
-
-    };
+    console.log('Retrieved race results!');
+    return { success: true, times: JSON.parse(results.times_array), runners: JSON.parse(results.runners_array) };
   } catch (error) {
-    return { success: false, message: 'Failed to fetch current results' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: 'Unable to retrieve race results' };
   }
 }
 
+// Clear table //
 export async function clearDBData(table) {
-  const validTables = ['race_data', 'race_results'];
-  if (!validTables.includes(table)) {
-    return { success: false, message: 'Invalid table name' };
-  }
-
   try {
     const db = await dbConn;
+
+    const validTables = ['race_data', 'race_results'];
+
+    if (!validTables.includes(table)) {
+      console.error('Invalid table name!');
+      return { success: false, error: 'Invalid table name!' };
+    }
+
     await db.run(`DELETE FROM ${table}`);
-    return { success: true };
+
+    console.log(`Successfully cleared table ${table}`);
+    return { success: true, message: `Successfully cleared table ${table}` };
   } catch (error) {
-    return { success: false, message: 'Failed to clear data' };
+    console.error(`Database Error: ${error.message}`);
+    return { success: false, error: `Could not clear ${table} table` };
   }
 }

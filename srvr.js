@@ -21,244 +21,151 @@ app.get('/runners.csv', (req, res) => {
   res.sendFile(path.join(__dirname, 'runners.csv'));
 });
 
-async function addTime(req, res) {
+async function submitData(req, res) {
   try {
-    const { times, id } = req.body;
+    const { type, data, id } = req.body;
 
-    if (times.length === 0) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'No time data provided',
-      });
+    if (data.length === 0) {
+      return res.status(400).json({ status: 'error', message: `Please provide some ${type} data!` });
     }
 
-    const result = await db.addRaceData('times', times, id);
+    const result = await db.addRaceData(type, data, id);
 
     if (!result.success) {
-      return res.status(500).json({
-        status: 'error',
-        message: result.error || 'Failed to save timing data',
-      });
+      console.log(`Unable to save ${type} data. Error: ${result.error}`);
+      return res.status(500).json({ status: 'error', message: `Unable to save ${type} data` });
     }
 
-    return res.json({
-      status: 'success',
-      message: 'Timing data submitted successfully',
-    });
+    console.log(`${type} data submitted successfully!`);
+    return res.status(200).json({ status: 'success', message: `${type} data submitted successfully!` });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
+    console.error(`Server error: ${error}`);
+    return res.status(500).json({ status: 'error', message: 'Unable to save data due to server error' });
   }
 }
 
-async function addRunners(req, res) {
+async function updateData(req, res) {
   try {
-    const { type, runners, id } = req.body;
+    const { type, data, id } = req.body;
 
-    if (runners.length === 0) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'No runner data provided',
-      });
-    }
-
-    const result = await db.addRaceData(type, runners, id);
+    const result = await db.updateRaceData(type, data, id);
 
     if (!result.success) {
-      return res.status(500).json({
-        status: 'error',
-        message: result.error || 'Failed to save runner data',
-      });
+      console.log(`Unable to update ${type} data. Error: ${result.error}`);
+      return res.status(500).json({ status: 'error', message: `Unable to update ${type} data` });
     }
 
-    return res.json({
-      status: 'success',
-      message: 'Runner data submitted successfully',
-    });
+    console.log(`Updated ${type} data!`);
+    return res.status(200).json({ status: 'success', message: `The ${type} data updated successfully` });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
+    console.error(`Server error: ${error}`);
+    return res.status(500).json({ status: 'error', message: 'Unable to update data due to server error' });
   }
 }
 
-async function createResults(req, res) {
+async function getSpecificData(req, res) {
   try {
-    const { results } = req.body;
+    const { type, id } = req.body;
 
-    if (results.length === 0) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'No results data provided',
-      });
+    const result = await db.getRaceData(type, id);
+
+    if (!result.success) {
+      console.log(`Unable to get ${type} data. Error: ${result.error}`);
+      return res.status(500).json({ status: 'error', message: `Unable to get ${type} all data` });
     }
 
-    const times = [];
-    const runners = [];
-
-    for (let i = 0; i < results.length; i++) {
-      times.push(results[i].time);
-      runners.push({
-        id: results[i].id,
-        name: results[i].name,
-        position: results[i].position,
-      });
-    }
-
-    const result = await db.addRaceResult(times, runners);
-
-    if (result.success) {
-      return res.json({
-        status: 'success',
-        message: 'Results saved successfully',
-      });
-    } else {
-      return res.status(500).json({
-        status: 'error',
-        message: result.error || 'Failed to save results',
-      });
-    }
+    console.log(`Successfully got ${type} data!`);
+    res.json({ status: 'success', data: result.data });
   } catch (error) {
-    console.error('Error creating results:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
+    console.error(`Server error: ${error}`);
+    res.status(500).json({ status: 'error', message: 'Server error' });
   }
 }
+
 
 async function getAllData(req, res) {
   try {
     const result = await db.getAllRaceData();
 
     if (!result.success) {
-      return res.status(500).json(result);
+      console.log(`Unable to get all data. Error: ${result.error}`);
+      return res.status(500).json({ status: 'error', message: 'Unable to get all data' });
     }
 
-    res.json({
-      status: 'success',
-      data: result.data,
-    });
+    console.log('Successfully got all data!');
+    res.json({ status: 'success', data: result.data });
   } catch (error) {
-    console.error('Error in route handler:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-      error: error.message,
-    });
+    console.error(`Server error: ${error}`);
+    res.status(500).json({ status: 'error', message: 'Could not get data due to server error' });
   }
 }
 
-async function getTimes(req, res) {
+async function addResult(req, res) {
   try {
-    const result = await db.getRaceData('times');
-    res.json(result);
-  } catch (error) {
-    console.error('Error fetching times:', error);
-    res.status(500).json({ status: 'error', message: 'Error fetching times' });
-  }
-}
+    const { results } = req.body;
 
-async function getRunners(req, res) {
-  try {
-    const result = await db.getRaceData('runners');
-    res.json(result);
+    const times = [];
+    const runners = [];
+
+    for (const result of results) {
+      times.push(result.time);
+      runners.push({
+        id: result.id,
+        name: result.name,
+        position: result.position,
+      });
+    }
+
+    const result = await db.addRaceResult(times, runners);
+
+    if (!result.success) {
+      console.log('Unable to save results.');
+      return res.status(500).json({ status: 'error', message: `Unable to save the results. Error: ${result.error}` });
+    }
+
+    console.log('Successfully saved race results');
+    return res.json({ status: 'success', message: 'Race results saved successfully' });
   } catch (error) {
-    console.error('Error fetching runners:', error);
-    res.status(500).json({ status: 'error', message: 'Error fetching runners' });
+    console.error('Error saving race results:', error);
+    return res.status(500).json({ status: 'error', message: 'Unable to save the results due to server error' });
   }
 }
 
 async function getResults(req, res) {
   try {
-    const dbResult = await db.getCurrentResults();
+    const result = await db.getRaceResults();
 
-    if (!dbResult.success) {
-      return res.status(500).json({
-        status: 'error',
-        message: dbResult.error || 'Database error',
+    if (!result.success) {
+      console.log(`Unable to get race result. Error: ${result.error}`);
+      return res.status(500).json({ status: 'error', message: 'Unable to get race results' });
+    }
+
+    const raceResults = [];
+
+    for (let i = 0; i < result.length; i++) {
+      raceResults.push({
+        position: result.runners[i].position,
+        name: result.runners[i].name,
+        time: result.times[i],
       });
     }
 
-    const results = [];
-
-    for (let i = 0; i < dbResult.length; i++) {
-      results.push({
-        position: dbResult.runners[i].position,
-        name: dbResult.runners[i].name,
-        time: dbResult.times[i],
-      });
-    }
-
-    return res.json({
-      status: 'success',
-      hasResults: results.length > 0,
-      results,
-    });
+    console.log('Successfully got race result!');
+    res.json({ status: 'success', data: result.data });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
+    console.error(`Server error: ${error}`);
+    res.status(500).json({ status: 'error', message: 'Could not get race result due to server error' });
   }
 }
 
-async function updateTimesData(req, res) {
-  try {
-    const { id, times } = req.body;
+app.post('/submit-data', submitData);
+app.post('/update-data', updateData);
 
-    const result = await db.editRaceData('times', times, id);
-
-    if (result.success) {
-      res.json({ status: 'success', message: 'Times updated' });
-    } else {
-      res.status(400).json({ status: 'error', message: result.error });
-    }
-  } catch (error) {
-    console.error('Update times error:', error);
-    res.status(500).json({ status: 'error', message: 'Internal server error' });
-  }
-}
-
-async function updateRunnersData(req, res) {
-  try {
-    const { id, runners } = req.body;
-
-    const result = await db.editRaceData('runners', runners, id);
-
-    if (result.success) {
-      res.json({ status: 'success', message: 'Runners updated' });
-    } else {
-      res.status(400).json({ status: 'error', message: result.error });
-    }
-  } catch (error) {
-    console.error('Update runners error:', error);
-    res.status(500).json({ status: 'error', message: 'Internal server error' });
-  }
-}
-
-app.post('/submit-timings', addTime);
-app.post('/submit-runners', addRunners);
-app.post('/create-results', createResults);
-app.post('/update-times', updateTimesData);
-app.post('/update-runners', updateRunnersData);
-app.get('/get-times', getTimes);
-app.get('/get-runners', getRunners);
 app.get('/get-all-data', getAllData);
-app.get('/get-results', getResults);
+app.get('/get-type-data', getSpecificData);
 
-async function testClear() {
-  const result = await db.clearDBData('race_data');
-  console.log('Clear result:', result);
-}
-
-testClear();
+app.post('/add-race-result', addResult);
+app.get('/get-race-result', getResults);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

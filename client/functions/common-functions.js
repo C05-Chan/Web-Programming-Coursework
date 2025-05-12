@@ -1,8 +1,8 @@
 
 export const el = {};
-const allElementsWithId = document.querySelectorAll('[id]');
+const allIdElements = document.querySelectorAll('[id]');
 
-allElementsWithId.forEach(element => {
+allIdElements.forEach(element => {
   const key = element.id.replace(/-/g, '_'); // the g allows all hyphen in the id have '_' rather than just the first hyphen
   el[key] = element;
 });
@@ -32,13 +32,9 @@ export function getClientID() {
 }
 
 export function errorMessageDisplay(message, type) {
-  const errorColours = [
-    { type: 'error', colour: 'red' },
-    { type: 'success', colour: 'green' },
-  ];
-
-  el.error_message.textContent = message;
-
-  const colour = errorColours.find(config => config.type === type);
-  el.error_message.style.color = colour ? colour.colour : 'black';
+  if (type === 'success') {
+    message.classList.add('success');
+  } else if (type === 'error') {
+    message.classList.add('error');
+  }
 }

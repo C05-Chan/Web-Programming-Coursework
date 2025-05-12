@@ -22,7 +22,7 @@ function getRunners() {
     });
 }
 
-el.record_runner.addEventListener('click', async () => {
+export async function addRunner() { //CHANGE FOR..OF LOOP AND CHANGE THE WAY IT DISPLATS THE LIST
   el.error_message.textContent = '';
   const idNumber = el.runner_ID.value;
   const position = el.runner_position.value;
@@ -47,10 +47,11 @@ el.record_runner.addEventListener('click', async () => {
 
   const runnerName = `${targetedRunner[1]} ${targetedRunner[2]}`;
   const runnersInfo = { id: idNumber, name: runnerName, position };
+
   recordedRunners.push(runnersInfo);
 
   updateRunnersList(recordedRunners);
-});
+}
 
 function updateRunnersList(runners) {
   el.runners_list.innerHTML = '';
@@ -62,7 +63,9 @@ function updateRunnersList(runners) {
   });
 }
 
-el.submit_runners.addEventListener('click', async function () {
+export async function submitRunnersRecords() {
+  errorMessageDisplay('', null);
+
   if (recordedRunners.length === 0) {
     errorMessageDisplay('No runners recorded to submit', 'error');
     return;
@@ -78,20 +81,20 @@ el.submit_runners.addEventListener('click', async function () {
     const result = await response.json();
 
     if (!response.ok) {
-      errorMessageDisplay(result.message, 'error');
+      errorMessageDisplay(`Unable to submit time data. Error: ${result.error}`);
       localStorage.setItem('runners', JSON.stringify(recordedRunners));
       return;
     }
 
-    console.log('Runners submitted successfully:', recordedRunners);
+    console.log(`Runners submitted successfully: ${result}`);
     errorMessageDisplay('Runners submitted successfully:', 'success');
 
-    if (localStorage.getItem('runners')) {
-      localStorage.removeItem('runners');
-    }
+    // if (localStorage.getItem('runners')) {
+    //   localStorage.removeItem('runners');
+    // }
   } catch (error) {
-    console.error('Error:', error);
+    console.error(`Error: ${error}`);
     errorMessageDisplay('Error submitting runner, it is currently stored locally, please try again out of offline mode', 'error');
     localStorage.setItem('runners', JSON.stringify(recordedRunners));
   }
-});
+}
