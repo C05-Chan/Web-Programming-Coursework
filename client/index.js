@@ -4,7 +4,10 @@ import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeReco
 import { addRunner, submitRunnersRecords } from './functions/runners.js';
 import { runnersResultsBtn } from './functions/results.js';
 
-el.runners_results.addEventListener('click', runnersResultsBtn);
+el.runners_results.addEventListener('click', () => {
+  clearContent();
+  runnersResultsBtn();
+});
 
 el.admin_view.addEventListener('click', () => {
   clearContent();
@@ -57,8 +60,8 @@ el.save_runners.addEventListener('click', saveNewRunners);
 
 
 el.volunteer_view.addEventListener('click', () => {
-  showElement(document.querySelector('.volunteer-nav'));
-  hideElement(document.querySelector('.admin-nav'));
+  showElement(el.volunteer_nav);
+  hideElement(el.create_results);
 });
 
 el.timer.addEventListener('click', () => {

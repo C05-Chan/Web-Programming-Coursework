@@ -11,7 +11,24 @@ async function getResults() {
       return { results: [], hasResults: false };
     }
 
-    return result;
+    if (!result.times || !result.runners || result.times.length === 0 || result.runners.length === 0) {
+      return { results: [], hasResults: false };
+    }
+
+
+    const combinedResults = [];
+    const minLength = Math.min(result.times.length, result.runners.length);
+
+    for (let i = 0; i < minLength; i++) {
+      combinedResults.push({
+        position: result.runners[i].position,
+        name: result.runners[i].name,
+        time: result.times[i],
+        id: result.runners[i].id,
+      });
+    }
+
+    return { results: combinedResults, hasResults: combinedResults.length > 0 };
   } catch (error) {
     console.error(`Error getting results: ${error}`);
     errorMessageDisplay('Could not get the results', 'error');
@@ -22,13 +39,13 @@ async function getResults() {
 export async function runnersResultsBtn() {
   clearContent();
   el.error_message.textContent = '';
-  showElement(document.querySelector('#result-container'));
+  showElement(el.result_container);
 
   const data = await getResults();
   const tbody = el.results_table.querySelector('tbody');
   tbody.innerHTML = '';
 
-  if (!data.hasResults || !Array.isArray(data.results) || data.results.length === 0) {
+  if (!data.hasResults || data.results.length === 0) {
     errorMessageDisplay('No results found', 'error');
     return;
   }

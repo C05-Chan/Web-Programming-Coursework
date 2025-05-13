@@ -6,7 +6,7 @@ let editItem = null;
 
 async function getSubmission() {
   try {
-    const response = await fetch('get-all-data');
+    const response = await fetch('/get-all-data');
 
     const result = await response.json();
 
@@ -413,12 +413,12 @@ export async function generateResults() {
 
     const result = await response.json();
 
-    if (response.ok) {
-      errorMessageDisplay('Results created successfully!', 'success');
-      el.runners_results.click();
-    } else {
+    if (!response.ok) {
       errorMessageDisplay(result.message, 'error');
+      return;
     }
+    errorMessageDisplay('Results created successfully!', 'success');
+    el.runners_results.click();
   } catch (error) {
     console.error('Error creating results:', error);
     errorMessageDisplay('Error creating results', 'error');

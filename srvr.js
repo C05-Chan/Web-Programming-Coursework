@@ -141,18 +141,8 @@ async function getResults(req, res) {
       return res.status(500).json({ status: 'error', message: 'Unable to get race results' });
     }
 
-    const raceResults = [];
-
-    for (let i = 0; i < result.length; i++) {
-      raceResults.push({
-        position: result.runners[i].position,
-        name: result.runners[i].name,
-        time: result.times[i],
-      });
-    }
-
     console.log('Successfully got race result!');
-    res.json({ status: 'success', data: result.data });
+    res.json({ status: 'success', times: result.times || [], runners: result.runners || [] });
   } catch (error) {
     console.error(`Server error: ${error}`);
     res.status(500).json({ status: 'error', message: 'Could not get race result due to server error' });
@@ -162,6 +152,9 @@ async function getResults(req, res) {
 async function testClear() {
   const result = await db.clearDBData('race_data');
   console.log('Clear result:', result);
+
+  const result2 = await db.clearDBData('race_results');
+  console.log('Clear result:', result2);
 }
 
 testClear();

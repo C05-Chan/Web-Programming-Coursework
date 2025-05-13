@@ -31,7 +31,7 @@ export function getRunners() {
 
 export function clearContent() {
   if (el.error_message) el.error_message.textContent = '';
-  document.querySelectorAll('.section').forEach((content) => {
+  document.querySelectorAll('.section-container').forEach((content) => {
     content.style.display = 'none';
   });
 }
