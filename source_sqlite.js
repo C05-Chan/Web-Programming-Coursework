@@ -47,7 +47,7 @@ export async function updateRaceData(type, data, id) {
   try {
     const db = await dbConn;
 
-    await db.run('UPDATE race_data SET data_array = ? WHERE type = ? AND client_id = ?',
+    await db.run('UPDATE race_data SET data_array = ? WHERE data_type = ? AND client_id = ?',
       [JSON.stringify(data), type, id],
     );
 
@@ -70,9 +70,9 @@ export async function getAllRaceData() {
     for (const row of result) {
       formattedData.push({
         raceData_id: row.raceData_id,
+        client_id: row.client_id,
         data_type: row.data_type,
         data_array: JSON.parse(row.data_array),
-        client_id: row.client_id,
         time: row.time,
       });
     }
@@ -88,7 +88,7 @@ export async function getRaceData(type, id) {
   try {
     const db = await dbConn;
 
-    const result = await db.all('SELECT * FROM race_data WHERE type = ? AND client_id = ?',
+    const result = await db.all('SELECT * FROM race_data WHERE data_type = ? AND client_id = ?',
       [type, id],
     );
 
@@ -112,7 +112,7 @@ async function deleteRaceData(type, id) {
   try {
     const db = await dbConn;
 
-    await db.run('DELETE FROM race_data WHERE type = ? AND client_id = ?',
+    await db.run('DELETE FROM race_data WHERE data_type = ? AND client_id = ?',
       [type, id],
     );
 

@@ -1,7 +1,8 @@
-import { el, showElement, hideElement, errorMessageDisplay, clearContent } from './common-functions';
+import { el, showElement, hideElement, errorMessageDisplay, clearContent, getRunners } from './common.js';
 
 let updateList = [];
 let selectedClientId = null;
+let editItem = null;
 
 async function getSubmission() {
   try {
@@ -23,19 +24,13 @@ async function getSubmission() {
 }
 
 export async function adminBtn() {
-  clearContent();
-
-  showElement(el.admin_view);
-  showElement(document.querySelector('.admin-nav'));
-  hideElement(document.querySelector('.volunteer-nav'));
-
   const data = await getSubmission();
-  const tableBody = el.race_data_table('tbody');
+  const tableBody = el.race_data_table.querySelector('tbody');
 
   if (data.length === 0) {
     tableBody.innerHTML = `
       <tr>
-      <td colspan="4">No results available</td>
+        <td colspan="4">No results available</td>
       </tr>`;
     return;
   }
@@ -45,7 +40,9 @@ export async function adminBtn() {
   for (const item of data) {
     const row = document.createElement('tr');
 
-    for (const value of Object.values(item)) {
+    const format = [item.client_id, item.data_type, item.data_array.length, item.time];
+
+    for (const value of format) {
       const cell = document.createElement('td');
       cell.textContent = value;
       row.appendChild(cell);
@@ -58,91 +55,276 @@ export async function adminBtn() {
 
         updateList = [...item.data_array];
         selectedClientId = item.client_id;
-
-        showElement(el.modify_times);
-        editTimesList();
+        displayTimesList();
       } else {
         clearContent();
-        showElement(el.runner_management);
+        showElement(el.runner_management_container);
 
         updateList = [...item.data_array];
         selectedClientId = item.client_id;
 
-        showElement(el.modify_runners);
-        editRunnersList();
+        displayRunnersList();
       }
     });
 
     tableBody.appendChild(row);
   }
 }
-
 // Modify Times //
 
-export async function displayTimesList() {
-  try {
+export function displayTimesList() {
+  el.times_management_list.innerHTML = '';
+
+  updateList.forEach(item => {
     const listItem = document.createElement('li');
-    const response = await fetch('/get-times');
-
-    if (!response.ok) {
-      listItem.textContent = 'No times available!';
-      el.times.management.list.appendChild(listItem);
-      return;
-    }
-
-    const times = await response.json();
-
-    listItem.textContent('');
-    el.time_management_container.appendChild(listItem);
-
-    for (const time of times) {
-      listItem.textContent = time;
-      el.times.management.list.appendChild(listItem);
-    }
-
-    errorMessageDisplay('Times loaded successfully', 'success');
-  } catch (error) {
-    errorMessageDisplay('Failed to load times', 'error');
-    console.error('Error fetching times:', error);
-  }
+    listItem.textContent = item;
+    el.times_management_list.appendChild(listItem);
+  });
 }
 
-export async function editTimesList() {
+export function editTimesList() {
+  el.times_management_list.innerHTML = '';
   const timesListItem = document.createElement('li');
 
-  showElement(el.save_times);
-  showElement(el.add_time);
-
   if (!updateList || updateList.length === 0) {
-    timesListItem.textContent('');
+    timesListItem.textContent = '';
     return;
   }
 
-  updateList.forEach((time, index) => {
-    const wrapper = document.createElement('section');
-    wrapper.className = 'time-entry';
+  for (let i = 0; i < updateList.length; i++) {
+    const time = updateList[i];
 
-    const span = document.createElement('span');
-    span.textContent = time;
+    const modifySpecificTime = document.createElement('div');
+
+    const timeShown = document.createElement('span');
+    timeShown.textContent = time;
 
     const editTime = document.createElement('button');
     editTime.textContent = 'Edit';
-    editTime.addEventListener('click', () => {
-      editItem = index;
-      el.time_input.value = time;
-      showElement(document.querySelector('.popup'));
-    });
+
+    editTime.addEventListener('click', () => editSavedTime(time, i));
 
     const deleteTime = document.createElement('button');
     deleteTime.textContent = 'Delete';
-    deleteTime.addEventListener('click', () => {
-      updateList.splice(index, 1);
-      editTimesList(); // Refresh the list
+
+    deleteTime.addEventListener('click', () => deleteSavedTime(i));
+
+
+    modifySpecificTime.appendChild(timeShown);
+    modifySpecificTime.appendChild(editTime);
+    modifySpecificTime.appendChild(deleteTime);
+
+    el.times_management_list.appendChild(modifySpecificTime);
+  }
+}
+
+function editSavedTime(time, index) {
+  editItem = index;
+  el.time_input.value = time;
+  showElement(el.time_popup);
+}
+
+function deleteSavedTime(index) {
+  updateList.splice(index, 1);
+  editTimesList();
+}
+
+export function addNewTime() {
+  editItem = null;
+  el.time_input.value = '';
+  showElement(el.time_popup);
+}
+
+export function popupTimeDone() {
+  const newTime = el.time_input.value.trim();
+  if (!/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d):(\d{1,3})$/.test(newTime)) { // Checks if new time input is in the HH:MM:SS:MMM format //
+    errorMessageDisplay('Invalid format. Please use hh:mm:ss:ms', 'error');
+    return;
+  }
+
+  if (editItem !== null) {
+    updateList[editItem] = newTime;
+    errorMessageDisplay('Time updated successfully', 'success');
+    editItem = null;
+  } else {
+    updateList.push(newTime);
+    updateList.sort();
+    errorMessageDisplay('Time added successfully', 'success');
+  }
+
+  updateList.sort();
+  hideElement(el.time_popup);
+  editTimesList();
+}
+
+export function popupTimeCancel() {
+  hideElement(el.time_popup);
+  editItem = null;
+}
+
+export async function saveNewTimes() {
+  try {
+    const response = await fetch('/update-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'times', data: updateList, id: selectedClientId }),
     });
 
-    wrapper.appendChild(span);
-    wrapper.appendChild(editTime);
-    wrapper.appendChild(deleteTime);
-    el.times_management_list.appendChild(wrapper);
+    const result = await response.json();
+    if (!response.ok) {
+      console.log(`Failed to update times ${result.message}`);
+      errorMessageDisplay('Unable to update times', 'error');
+      localStorage.setItem('times', JSON.stringify(updateList));
+      return;
+    }
+
+    console.log('Update to new times!');
+    errorMessageDisplay('Times updated successfully', 'success');
+
+    hideElement(el.modify_times_container);
+    showElement(el.modify_times);
+
+    displayTimesList();
+  } catch (error) {
+    console.error('Error updating times:', error);
+    errorMessageDisplay('Error updating times.', 'error');
+  }
+}
+
+// Runners modify //
+export function displayRunnersList() {
+  el.runners_management_list.innerHTML = '';
+
+  updateList.forEach(item => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `Position ${item.position}: ${item.name} (ID: ${item.id})`;
+    el.runners_management_list.appendChild(listItem);
   });
+}
+
+export function editRunnersList() {
+  el.runners_management_list.innerHTML = '';
+  const runnersListItem = document.createElement('li');
+
+  if (!updateList || updateList.length === 0) {
+    runnersListItem.textContent = '';
+    return;
+  }
+
+  for (let i = 0; i < updateList.length; i++) {
+    const runner = updateList[i];
+
+    const modifySpecificRunner = document.createElement('div');
+
+    const runnerShown = document.createElement('span');
+    runnerShown.textContent = `Position ${runner.position}: ${runner.name} (ID: ${runner.id})`;
+
+    const editRunner = document.createElement('button');
+    editRunner.textContent = 'Edit Position';
+
+    editRunner.addEventListener('click', () => editSavedRunner(runner, i));
+
+    const deleteRunner = document.createElement('button');
+    deleteRunner.textContent = 'Remove';
+
+    deleteRunner.addEventListener('click', () => deleteSavedRunner(i));
+
+    modifySpecificRunner.appendChild(runnerShown);
+    modifySpecificRunner.appendChild(editRunner);
+    modifySpecificRunner.appendChild(deleteRunner);
+
+    el.runners_management_list.appendChild(modifySpecificRunner);
+  }
+}
+
+async function editSavedRunner(runner, index) {
+  editItem = index;
+
+  const runnersData = await getRunners();
+  console.log(runnersData);
+  const targetedRunner = runnersData.find(r => r[0] === runner.id);
+
+  el.edit_runner_id.value = targetedRunner[0];
+  el.edit_runner_position.value = runner.position;
+  showElement(el.runner_popup);
+}
+
+function deleteSavedRunner(index) {
+  updateList.splice(index, 1);
+  editRunnersList();
+}
+
+export function addNewRunner() {
+  el.edit_runner_position.value = '';
+  el.edit_runner_id.value = '';
+  showElement(el.runner_popup);
+}
+
+export async function popupRunnerDone() {
+  const newPosition = el.edit_runner_position.value.trim();
+  const newID = el.edit_runner_id.value.trim();
+
+  if (!newID || !newPosition) {
+    errorMessageDisplay('Please enter both ID and Position', 'error');
+    return;
+  }
+  const runnersData = await getRunners();
+  const targetedRunner = runnersData.find(runner => runner[0] === newID);
+
+  if (!targetedRunner) {
+    errorMessageDisplay('Runner ID not found', 'error');
+    return;
+  }
+
+
+  const runnerName = `${targetedRunner[1]} ${targetedRunner[2]}`;
+  const newRunnersInfo = { id: newID, name: runnerName, position: newPosition };
+
+  if (editItem !== null) {
+    updateList[editItem] = newRunnersInfo;
+    errorMessageDisplay('Runner updated successfully', 'success');
+    editItem = null;
+  } else {
+    updateList.push(newRunnersInfo);
+    updateList.sort();
+    errorMessageDisplay('Runner added successfully', 'success');
+  }
+
+  updateList.sort((a, b) => a.position - b.position);
+  hideElement(el.runner_popup);
+  editRunnersList();
+}
+
+export function popupRunnersCancel() {
+  hideElement(el.runner_popup);
+  editItem = null;
+}
+
+export async function saveNewRunners() {
+  try {
+    const response = await fetch('/update-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'runners', data: updateList, id: selectedClientId }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      console.log(`Failed to update runner ${result.message}`);
+      errorMessageDisplay('Unable to update times', 'error');
+      localStorage.setItem('runners', JSON.stringify(updateList));
+      return;
+    }
+
+    console.log('Update to new runners!');
+    errorMessageDisplay('Runners updated successfully', 'success');
+
+    hideElement(el.modify_runner_container);
+    showElement(el.modify_runners);
+
+    displayRunnersList();
+  } catch (error) {
+    console.error('Error updating runners:', error);
+    errorMessageDisplay('Error updating runners.', 'error');
+  }
 }

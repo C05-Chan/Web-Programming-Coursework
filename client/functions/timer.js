@@ -1,4 +1,4 @@
-import { el, showElement, hideElement, errorMessageDisplay, getClientID } from './common-functions';
+import { el, showElement, hideElement, errorMessageDisplay, getClientID } from './common.js';
 
 let timerInterval;
 let currentMilliseconds = 0;
@@ -86,10 +86,10 @@ export async function submitTimeRecords() {
   el.stop.click();
 
   try {
-    const response = await fetch('/submit-timings', {
+    const response = await fetch('/submit-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'times', times: recordedTimes, id: getClientID }),
+      body: JSON.stringify({ type: 'times', data: recordedTimes, id: getClientID() }),
     });
 
     const result = await response.json();

@@ -3,9 +3,9 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RUN PARK</title>
-        <link rel="stylesheet" href="/style.css">
-        <script src="/index.js" defer></script>
-        <link rel="manifest" href="/manifest.json">
+        <link rel="stylesheet" href="./style.css">
+        <script type="module" src="./index.js"></script>
+        <link rel="manifest" href="./manifest.json">
     </head>
 
     <body>
@@ -17,11 +17,11 @@
                 <button class ="nav-buttons"id="admin-view">Admin</button>
                 <button class ="nav-buttons" id="volunteer-view">Volunteer</button>
 
-                <section class="admin-nav" style="display: none">
+                <section id="admin-nav" style="display: none">
                     <button class="nav-buttons" id="create-results">Create</button>
                 </section>
 
-                <section class="volunteer-nav" style="display: none;">
+                <section id="volunteer-nav" style="display: none">
                     <button class ="nav-buttons" id="timer">Timer</button>
                     <button class ="nav-buttons" id="positions">Submit Positions</button>
                 </section>
@@ -66,8 +66,8 @@
                         <label for="time-input">Time (hh:mm:ss:ms)</label>
                         <input type="text" id="time-input" placeholder="00:00:00:000">
 
-                        <button type="submit" id="popup_done">Done</button>
-                        <button id="popup-cancel">Cancel</button>
+                        <button type="submit" id="times-popup-done">Done</button>
+                        <button id="times-popup-cancel">Cancel</button>
                     </section>
                 </section>
             </section>
@@ -85,7 +85,7 @@
                     <button id="save-runners">Save Runners</button> 
                     <button id="add-runner">Add Runner</button>
                 
-                    <section class="runner-popup" style="display:none">
+                    <section class="popup" id="runner-popup" style="display:none">
                         <label for="edit-runner-position">Position:</label>
                         <input type="number" id="edit-runner-position">
                     

@@ -1,28 +1,8 @@
-import { el, errorMessageDisplay, getClientID } from './common-functions';
+import { el, errorMessageDisplay, getClientID, getRunners } from './common.js';
 
 const recordedRunners = [];
-const runnersData = [];
 
-function getRunners() {
-  return fetch('/runners.csv')
-    .then(response => response.text())
-    .then(csvText => {
-      const rows = csvText.trim().split('\n');
-
-      rows.forEach(row => {
-        runnersData.push(row.split(','));
-      });
-
-      return runnersData;
-    })
-    .catch(err => {
-      errorMessageDisplay('Error loading CSV', 'error');
-      console.error('Error loading CSV:', err);
-      return [];
-    });
-}
-
-export async function addRunner() { //CHANGE FOR..OF LOOP AND CHANGE THE WAY IT DISPLATS THE LIST
+export async function addRunner() { // CHANGE FOR..OF LOOP AND CHANGE THE WAY IT DISPLATS THE LIST //
   el.error_message.textContent = '';
   const idNumber = el.runner_ID.value;
   const position = el.runner_position.value;
@@ -37,7 +17,7 @@ export async function addRunner() { //CHANGE FOR..OF LOOP AND CHANGE THE WAY IT 
     return;
   }
 
-  await getRunners();
+  const runnersData = await getRunners();
   const targetedRunner = runnersData.find(runner => runner[0] === idNumber);
 
   if (!targetedRunner) {
@@ -72,10 +52,10 @@ export async function submitRunnersRecords() {
   }
 
   try {
-    const response = await fetch('/submit-runners', {
+    const response = await fetch('/submit-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'runners', runners: recordedRunners, id: getClientID }),
+      body: JSON.stringify({ type: 'runners', data: recordedRunners, id: getClientID() }),
     });
 
     const result = await response.json();

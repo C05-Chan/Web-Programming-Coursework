@@ -13,7 +13,7 @@ self.addEventListener('install', event => {
         './manifest.json',
         './images/placeholder_192.png',
         './images/placeholder_512.png',
-        '../runners.csv',
+        '../runnersDetails.csv',
       ]);
     })());
 });
@@ -53,60 +53,60 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// // const API_CACHE = 'api-cache';
-// // const CACHE = 'hsww';
+// const API_CACHE = 'api-cache';
+// const CACHE = 'hsww';
 
-// // function interceptFetch(evt) {
-// //   evt.respondWith(handleFetch(evt.request));
-// //   evt.waitUntil(updateCache(evt.request));
-// // }
+// function interceptFetch(evt) {
+//   evt.respondWith(handleFetch(evt.request));
+//   evt.waitUntil(updateCache(evt.request));
+// }
 
-// // async function updateCache(request) {
-// //   if (request.method === 'POST') return;
+// async function updateCache(request) {
+//   if (request.method === 'POST') return;
 
-// //   const c = await caches.open(CACHE);
-// //   const response = await fetch(request);
-// //   console.log('Updating cache ', request.url);
-// //   return c.put(request, response);
-// // }
+//   const c = await caches.open(CACHE);
+//   const response = await fetch(request);
+//   console.log('Updating cache ', request.url);
+//   return c.put(request, response);
+// }
 
-// // async function handleFetch(request) {
-// //   if (request.method === 'POST') return fetch(request);
+// async function handleFetch(request) {
+//   if (request.method === 'POST') return fetch(request);
 
-// //   // Check cache for API request //
-// //   if (request.url.includes('/get-results')) {
-// //     const cache = await caches.open(API_CACHE);
-// //     const cached = await cache.match(request);
-// //     if (cached) return cached;
-// //   }
-
-
-// //   const cache = await caches.open(CACHE);
-// //   const cachedCopy = await cache.match(request);
-// //   return cachedCopy || fetch(request);
-// // }
+//   // Check cache for API request //
+//   if (request.url.includes('/get-results')) {
+//     const cache = await caches.open(API_CACHE);
+//     const cached = await cache.match(request);
+//     if (cached) return cached;
+//   }
 
 
-// // const CACHEABLE = [
-// //   './',
-// //   './index.html',
-// //   './sw.js',
-// //   './index.js',
-// //   './style.css',
-// //   './runners.csv',
-// //   './manifest.json',
-// //   './placeholder_192.png',
-// //   './placeholder_512.png',
-// // ];
+//   const cache = await caches.open(CACHE);
+//   const cachedCopy = await cache.match(request);
+//   return cachedCopy || fetch(request);
+// }
 
-// // async function prepareCache() {
-// //   const c = await caches.open(CACHE);
-// //   await c.addAll(CACHEABLE);
-// //   console.log('Cache prepared.');
-// // }
 
-// // self.addEventListener('install', event => {
-// //   event.waitUntil(prepareCache());
-// // });
+// const CACHEABLE = [
+//   './',
+//   './index.html',
+//   './sw.js',
+//   './index.js',
+//   './style.css',
+//   '../runnersDetails.csv',
+//   './manifest.json',
+//   './placeholder_192.png',
+//   './placeholder_512.png',
+// ];
 
-// // self.addEventListener('fetch', interceptFetch);
+// async function prepareCache() {
+//   const c = await caches.open(CACHE);
+//   await c.addAll(CACHEABLE);
+//   console.log('Cache prepared.');
+// }
+
+// self.addEventListener('install', event => {
+//   event.waitUntil(prepareCache());
+// });
+
+// self.addEventListener('fetch', interceptFetch);

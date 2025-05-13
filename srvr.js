@@ -11,21 +11,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 app.use(express.json());
-app.use(express.static(__dirname + '/client'));
+app.use(express.static(path.join(__dirname, 'client')));
+
 
 app.get('/', (req, res) => {
   res.sendFile(`${__dirname}/client/index.html`);
 });
 
-app.get('/runners.csv', (req, res) => {
-  res.sendFile(path.join(__dirname, 'runners.csv'));
+app.get('/runnersDetails.csv', (req, res) => {
+  res.sendFile(path.join(__dirname, 'runnersDetails.csv'));
 });
 
 async function submitData(req, res) {
   try {
     const { type, data, id } = req.body;
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
       return res.status(400).json({ status: 'error', message: `Please provide some ${type} data!` });
     }
 
@@ -157,6 +158,13 @@ async function getResults(req, res) {
     res.status(500).json({ status: 'error', message: 'Could not get race result due to server error' });
   }
 }
+
+async function testClear() {
+  const result = await db.clearDBData('race_data');
+  console.log('Clear result:', result);
+}
+
+testClear();
 
 app.post('/submit-data', submitData);
 app.post('/update-data', updateData);
