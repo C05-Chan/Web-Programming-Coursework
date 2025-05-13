@@ -95,7 +95,7 @@ export async function submitTimeRecords() {
     const result = await response.json();
 
     if (!response.ok) {
-      errorMessageDisplay(`Unable to submit time data. Error: ${result.error}`);
+      errorMessageDisplay(`Unable to submit time data. Error: ${result.error}`, 'error');
       localStorage.setItem('times', JSON.stringify(recordedTimes));
       return;
     }

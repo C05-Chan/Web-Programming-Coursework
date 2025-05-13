@@ -4,36 +4,38 @@ export const el = {};
 
 const allIdElements = document.querySelectorAll('[id]');
 
-allIdElements.forEach(element => {
-  const key = element.id.replace(/-/g, '_'); // the g allows all hyphen in the id have '_' rather than just the first hyphen
+for (const element of allIdElements) {
+  const key = element.id.replace(/-/g, '_'); // the g allows all hyphens in the id to be replaced with '_'
   el[key] = element;
-});
-
-
-export function getRunners() {
-  const runnersData = [];
-  return fetch('/runnersDetails.csv')
-    .then(response => response.text())
-    .then(csvText => {
-      const rows = csvText.trim().split('\n');
-      rows.forEach(row => {
-        runnersData.push(row.split(','));
-      });
-
-      return runnersData;
-    })
-    .catch(err => {
-      errorMessageDisplay('Error loading CSV', 'error');
-      console.error('Error loading CSV:', err);
-      return [];
-    });
 }
+
+export async function getRunners() {
+  const runnersData = [];
+
+  try {
+    const response = await fetch('/runnersDetails.csv');
+    const csvText = await response.text();
+    const rows = csvText.trim().split('\n');
+
+    for (const row of rows) {
+      runnersData.push(row.split(','));
+    }
+
+    return runnersData;
+  } catch (error) {
+    errorMessageDisplay('Error loading CSV', 'error');
+    console.error('Error loading CSV:', error);
+    return [];
+  }
+}
+
 
 export function clearContent() {
   if (el.error_message) el.error_message.textContent = '';
-  document.querySelectorAll('.section-container').forEach((content) => {
-    content.style.display = 'none';
-  });
+  const contents = document.querySelectorAll('.section-container');
+  for (const section of contents) {
+    section.style.display = 'none';
+  }
 }
 
 export function showElement(e) {
@@ -45,7 +47,7 @@ export function hideElement(e) {
 }
 
 export function getClientID() {
-  let clientID = sessionStorage.getItem('clientID');
+  let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device //
 
   if (!clientID) {
     clientID = 'clientID-' + Math.random().toString(36).substring(2, 14);

@@ -72,11 +72,11 @@ export async function adminBtn() {
 export function displayTimesList() {
   el.times_management_list.innerHTML = '';
 
-  updateList.forEach(item => {
+  for (const time of updateList) {
     const listItem = document.createElement('li');
-    listItem.textContent = item;
+    listItem.textContent = time;
     el.times_management_list.appendChild(listItem);
-  });
+  }
 }
 
 export function editTimesList() {
@@ -193,11 +193,11 @@ export async function saveNewTimes() {
 export function displayRunnersList() {
   el.runners_management_list.innerHTML = '';
 
-  updateList.forEach(item => {
+  for (const runner of updateList) {
     const listItem = document.createElement('li');
-    listItem.textContent = `Position ${item.position}: ${item.name} (ID: ${item.id})`;
+    listItem.textContent = `Position ${runner.position}: ${runner.name} (ID: ${runner.id})`;
     el.runners_management_list.appendChild(listItem);
-  });
+  }
 }
 
 export function editRunnersList() {
@@ -415,6 +415,7 @@ export async function generateResults() {
 
     if (!response.ok) {
       errorMessageDisplay(result.message, 'error');
+      localStorage.setItem('results', JSON.stringify(results));
       return;
     }
     errorMessageDisplay('Results created successfully!', 'success');
@@ -422,5 +423,6 @@ export async function generateResults() {
   } catch (error) {
     console.error('Error creating results:', error);
     errorMessageDisplay('Error creating results', 'error');
+    localStorage.setItem('results', JSON.stringify(results));
   }
 }

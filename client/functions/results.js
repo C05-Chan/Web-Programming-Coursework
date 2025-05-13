@@ -50,19 +50,19 @@ export async function runnersResultsBtn() {
     return;
   }
 
-  data.results
-    .sort((a, b) => a.position - b.position)
-    .forEach(result => {
-      const row = document.createElement('tr');
+  const sortedResults = data.results.sort((a, b) => a.position - b.position);
 
-      const format = [result.position, result.name, result.time];
+  for (const result of sortedResults) {
+    const row = document.createElement('tr');
 
-      for (const value of format) {
-        const cell = document.createElement('td');
-        cell.textContent = value;
-        row.appendChild(cell);
-      }
+    const format = [result.position, result.name, result.time];
 
-      tbody.appendChild(row);
-    });
+    for (const value of format) {
+      const cell = document.createElement('td');
+      cell.textContent = value;
+      row.appendChild(cell);
+    }
+
+    tbody.appendChild(row);
+  }
 }

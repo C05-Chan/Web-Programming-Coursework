@@ -36,11 +36,11 @@ export async function addRunner() { // CHANGE FOR..OF LOOP AND CHANGE THE WAY IT
 function updateRunnersList(runners) {
   el.runners_list.innerHTML = '';
 
-  runners.forEach(runner => {
+  for (const runner of runners) {
     const listItem = document.createElement('li');
     listItem.textContent = `Position ${runner.position}: ${runner.name} (ID: ${runner.id})`;
     el.runners_list.prepend(listItem);
-  });
+  }
 }
 
 export async function submitRunnersRecords() {
