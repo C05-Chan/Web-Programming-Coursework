@@ -28,10 +28,7 @@ export async function adminBtn() {
   const tableBody = el.race_data_table.querySelector('tbody');
 
   if (data.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="4">No results available</td>
-      </tr>`;
+    errorMessageDisplay('No data available to create results', 'error');
     return;
   }
 
@@ -188,6 +185,7 @@ export async function saveNewTimes() {
   } catch (error) {
     console.error('Error updating times:', error);
     errorMessageDisplay('Error updating times.', 'error');
+    localStorage.setItem('times', JSON.stringify(updateList));
   }
 }
 
@@ -326,5 +324,103 @@ export async function saveNewRunners() {
   } catch (error) {
     console.error('Error updating runners:', error);
     errorMessageDisplay('Error updating runners.', 'error');
+    localStorage.setItem('runners', JSON.stringify(updateList));
+  }
+}
+
+
+export async function createResult() {
+  const data = await getSubmission();
+  const tableBody = el.race_data_table.querySelector('tbody');
+
+  if (data.length === 0) {
+    errorMessageDisplay('No data available to create results', 'error');
+    return;
+  }
+
+  tableBody.innerHTML = '';
+
+  for (const item of data) {
+    const row = document.createElement('tr');
+
+    const format = [item.client_id, item.data_type, item.data_array.length, item.time];
+
+    for (const value of format) {
+      const cell = document.createElement('td');
+      cell.textContent = value;
+      row.appendChild(cell);
+    }
+
+    const checkboxCell = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.dataset.type = item.data_type;
+    checkbox.dataset.data = JSON.stringify(item.data_array);
+    checkbox.value = item.client_id;
+
+    checkboxCell.appendChild(checkbox);
+    row.appendChild(checkboxCell);
+
+    tableBody.appendChild(row);
+  }
+}
+
+export async function generateResults() {
+  const timesArrays = [];
+  const runnersArrays = [];
+  const results = [];
+
+  const tableBody = el.race_data_table.querySelector('tbody');
+  const checkboxes = tableBody.querySelectorAll('input[type="checkbox"]');
+
+  for (const checkbox of checkboxes) {
+    if (checkbox.checked) {
+      const dataType = checkbox.dataset.type;
+      const dataArray = JSON.parse(checkbox.dataset.data);
+
+
+      if (dataType === 'times') {
+        timesArrays.push(...dataArray);
+      } else if (dataType === 'runners') {
+        runnersArrays.push(...dataArray);
+      }
+    }
+  }
+
+  if (timesArrays.length === 0 || runnersArrays.length === 0) {
+    errorMessageDisplay('You need both times and runners data to create results', 'error');
+    return;
+  }
+
+
+  for (let i = 0; i < timesArrays.length; i++) {
+    if (i < runnersArrays.length) {
+      results.push({
+        position: runnersArrays[i].position,
+        name: runnersArrays[i].name,
+        time: timesArrays[i],
+        id: runnersArrays[i].id,
+      });
+    }
+  }
+
+  try {
+    const response = await fetch('/add-race-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ results }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      errorMessageDisplay('Results created successfully!', 'success');
+      el.runners_results.click();
+    } else {
+      errorMessageDisplay(result.message, 'error');
+    }
+  } catch (error) {
+    console.error('Error creating results:', error);
+    errorMessageDisplay('Error creating results', 'error');
   }
 }

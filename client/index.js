@@ -1,17 +1,35 @@
 import { el, showElement, hideElement, clearContent } from './functions/common.js';
-import { adminBtn, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners } from './functions/admin.js';
+import { adminBtn, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners, createResult, generateResults } from './functions/admin.js';
 import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeRecords } from './functions/timer.js';
 import { addRunner, submitRunnersRecords } from './functions/runners.js';
+import { runnersResultsBtn } from './functions/results.js';
 
-// el.runners_results.addEventListener('click', showResults);
+el.runners_results.addEventListener('click', runnersResultsBtn);
 
 el.admin_view.addEventListener('click', () => {
-  console.log('el.admin_nav:', el.admin_nav);
   clearContent();
 
   showElement(el.admin_container);
-  showElement(el.admin_nav);
+  showElement(el.create_results);
   hideElement(el.volunteer_nav);
+  adminBtn();
+});
+
+el.create_results.addEventListener('click', () => {
+  clearContent();
+  showElement(el.admin_container);
+  hideElement(el.create_results);
+  showElement(el.create_results_buttons);
+
+  createResult();
+});
+
+el.submit_results.addEventListener('click', generateResults);
+
+el.cancel_create_results.addEventListener('click', () => {
+  showElement(el.create_results);
+  hideElement(el.create_results_buttons);
+
   adminBtn();
 });
 

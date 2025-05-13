@@ -13,13 +13,12 @@
             <h1>RUN PARK</h1>
 
             <nav class="nav-container">
-                <button class="nav-buttons" id="runners-results"> Overall Results</button>
+                <button class="nav-buttons" id="runners-results"> Runners</button>
                 <button class ="nav-buttons"id="admin-view">Admin</button>
                 <button class ="nav-buttons" id="volunteer-view">Volunteer</button>
 
-                <section id="admin-nav" style="display: none">
-                    <button class="nav-buttons" id="create-results">Create</button>
-                </section>
+    
+                <button class="nav-buttons" id="create-results" style="display: none">Create</button>
 
                 <section id="volunteer-nav" style="display: none">
                     <button class ="nav-buttons" id="timer">Timer</button>
@@ -46,6 +45,12 @@
                             <!--blank table initially, gets filled when there is data-->
                     </tbody>
                 </table>
+            </section>
+
+            <!-- Create Result -->
+            <section id="create-results-buttons" style="display: none">
+                <button type="submit" id="submit-results">Create Results</button>
+                <button id="cancel-create-results">Cancel</button>
             </section>
 
             <!-- Manage Times - Admin -->
