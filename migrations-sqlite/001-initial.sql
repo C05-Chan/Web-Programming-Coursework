@@ -1,3 +1,5 @@
+
+
 CREATE TABLE IF NOT EXISTS race_data (
   raceData_id INTEGER PRIMARY KEY AUTOINCREMENT,
   data_type TEXT NOT NULL CHECK (data_type IN ('times', 'runners')),

@@ -56,6 +56,14 @@ export function getClientID() {
   return clientID;
 }
 
+export function removeClientID() {
+  const clientID = sessionStorage.getItem('clientID');
+
+  if (clientID) {
+    sessionStorage.removeItem('clientID');
+  }
+}
+
 export function errorMessageDisplay(message, type) {
   el.error_message.classList.remove('success', 'error');
 

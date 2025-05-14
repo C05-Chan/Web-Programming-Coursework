@@ -1,4 +1,4 @@
-import { el, showElement, hideElement, errorMessageDisplay, getClientID } from './common.js';
+import { el, showElement, hideElement, errorMessageDisplay, getClientID, removeClientID } from './common.js';
 
 let timerInterval;
 let currentMilliseconds = 0;
@@ -12,6 +12,8 @@ function updateTimer() {
   const ms = currentMilliseconds % 1000;
 
   el.stopwatch_display.textContent = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${ms < 10 ? '00' + ms : ms < 100 ? '0' + ms : ms}`;
+
+  localStorage.setItem('timerDisplay', el.stopwatch_display.textContent);
 }
 
 export function startTimer() {
@@ -63,16 +65,26 @@ export function resetTimer() {
 }
 
 export function addTime() {
-  const timesListItem = document.createElement('li');
   const time = el.stopwatch_display.textContent;
-
-  timesListItem.textContent = time;
-  el.times_list.prepend(timesListItem);
-
   recordedTimes.push(time);
+  localStorage.setItem('times', JSON.stringify(recordedTimes));
 
-  errorMessageDisplay('Time recorded successfully', 'success');
+  errorMessageDisplay('Time recorded successfully!', 'success');
   console.log('Recorded times:', recordedTimes);
+
+  const list = JSON.parse(localStorage.getItem('times'));
+
+  displayRecordedTimes(list);
+}
+
+export function displayRecordedTimes(list) {
+  el.times_list.innerHTML = '';
+
+  for (const item of list) {
+    const timesListItem = document.createElement('li');
+    timesListItem.textContent = item;
+    el.times_list.prepend(timesListItem);
+  }
 }
 
 export async function submitTimeRecords() {
@@ -84,29 +96,59 @@ export async function submitTimeRecords() {
   }
 
   el.stop.click();
-
+  const clientId = getClientID();
   try {
     const response = await fetch('/submit-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'times', data: recordedTimes, id: getClientID() }),
+      body: JSON.stringify({ type: 'times', data: recordedTimes, id: clientId }),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
       errorMessageDisplay(`Unable to submit time data. Error: ${result.error}`, 'error');
-      localStorage.setItem('times', JSON.stringify(recordedTimes));
+      localStorage.setItem('server-times', JSON.stringify(recordedTimes));
+      localStorage.setItem('server-times-client', clientId);
       return;
     }
 
     console.log(`Times submitted successfully: ${result}`);
     errorMessageDisplay('Times submitted successfully:', 'success');
+    localStorage.setItem('times', JSON.stringify(recordedTimes));
+    localStorage.setItem('submitted-times', 'true');
+
 
     hideElement(document.querySelector('.stopwatch'));
+    showElement(el.clear_times);
   } catch (error) {
     console.log(`Error: ${error}`);
     errorMessageDisplay('Error submitting times, it is currently stored locally, please try again out of offline mode', 'error');
-    localStorage.setItem('times', JSON.stringify(recordedTimes));
+    localStorage.setItem('server-times', JSON.stringify(recordedTimes));
+    localStorage.setItem('server-times-client', clientId);
+  }
+}
+
+export function clearTimes() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  currentMilliseconds = 0;
+  recordedTimes = [];
+  el.times_list.innerHTML = '';
+  localStorage.removeItem('times');
+  localStorage.removeItem('submitted-times');
+  removeClientID();
+
+  showElement(document.querySelector('.stopwatch'));
+  hideElement(el.clear_times);
+}
+
+export function checkTimesSubmission() {
+  const isTimeSubmitted = localStorage.getItem('submitted-times');
+
+  if (isTimeSubmitted) {
+    hideElement(document.querySelector('.stopwatch'));
+    showElement(el.clear_times);
+    displayRecordedTimes(JSON.parse(localStorage.getItem('times')));
   }
 }

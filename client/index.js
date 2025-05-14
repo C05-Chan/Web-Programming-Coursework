@@ -1,7 +1,7 @@
-import { el, showElement, hideElement, clearContent, getClientID } from './functions/common.js';
+import { el, showElement, hideElement, clearContent } from './functions/common.js';
 import { adminBtn, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners, createResult, generateResults } from './functions/admin.js';
-import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeRecords } from './functions/timer.js';
-import { addRunner, submitRunnersRecords } from './functions/runners.js';
+import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeRecords, clearTimes, displayRecordedTimes, checkTimesSubmission } from './functions/timer.js';
+import { addRunner, submitRunnersRecords, clearRunners, displayRecordedRunners, checkRunnersSubmission } from './functions/runners.js';
 import { runnersResultsBtn } from './functions/results.js';
 
 
@@ -47,6 +47,7 @@ el.add_time.addEventListener('click', addNewTime);
 el.times_popup_done.addEventListener('click', popupTimeDone);
 el.times_popup_cancel.addEventListener('click', popupTimeCancel);
 el.save_times.addEventListener('click', saveNewTimes);
+el.clear_times.addEventListener('click', clearTimes);
 
 el.modify_runners.addEventListener('click', () => {
   showElement(el.modify_runner_container);
@@ -58,6 +59,7 @@ el.add_runner.addEventListener('click', addNewRunner);
 el.runner_popup_done.addEventListener('click', popupRunnerDone);
 el.runner_popup_cancel.addEventListener('click', popupRunnersCancel);
 el.save_runners.addEventListener('click', saveNewRunners);
+el.clear_runners.addEventListener('click', clearRunners);
 
 
 el.volunteer_view.addEventListener('click', () => {
@@ -68,6 +70,7 @@ el.volunteer_view.addEventListener('click', () => {
 el.timer.addEventListener('click', () => {
   clearContent();
   showElement(el.timer_container);
+  checkTimesSubmission();
 });
 
 el.start.addEventListener('click', startTimer);
@@ -80,6 +83,7 @@ el.submit_times.addEventListener('click', submitTimeRecords);
 el.positions.addEventListener('click', () => {
   clearContent();
   showElement(el.runners_container);
+  checkRunnersSubmission();
 });
 
 el.record_runner.addEventListener('click', addRunner);
@@ -89,6 +93,31 @@ el.submit_runners.addEventListener('click', submitRunnersRecords);
 async function registerServiceWorker() {
   if (navigator.serviceWorker) {
     await navigator.serviceWorker.register('./sw.js');
+  }
+}
+
+
+function loadLocalStorageData() {
+  const savedTimes = localStorage.getItem('times');
+  const savedRunners = localStorage.getItem('runners');
+  const savedTimerDisplay = localStorage.getItem('timerDisplay');
+
+  if (savedTimes) {
+    const list = JSON.parse(localStorage.getItem('times'));
+    displayRecordedTimes(list);
+    checkTimesSubmission();
+  }
+
+  if (savedRunners) {
+    const list = JSON.parse(localStorage.getItem('runners'));
+    displayRecordedRunners(list);
+    checkRunnersSubmission();
+  }
+
+  if (savedTimerDisplay) {
+    el.stopwatch_display.textContent = savedTimerDisplay;
+    hideElement(el.start);
+    showElement(el.resume);
   }
 }
 
@@ -109,43 +138,49 @@ async function isApplicationOffline() {
 }
 
 async function syncLocalStorageData() {
-  const localTime = localStorage.getItem('times');
-  const localRunners = localStorage.getItem('runners');
+  const localTime = localStorage.getItem('server-times');
+  const localTimeId = localStorage.getItem('server-times-client');
+
+  const localRunners = localStorage.getItem('server-runners');
+  const localRunnersId = localStorage.getItem('server-runners-client');
+
   const localResult = localStorage.getItem('results');
 
   try {
-    if (localTime) {
+    if (localTime && localTimeId) {
       const times = JSON.parse(localTime);
 
       const response = await fetch('/submit-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'times', data: times, id: getClientID() }),
+        body: JSON.stringify({ type: 'times', data: times, id: localTimeId }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.status === 'success') {
-        localStorage.removeItem('times');
+        localStorage.removeItem('server-times');
+        localStorage.removeItem('server-times-client');
         console.log('Successfully synced times to server');
       } else {
         console.log(`Failed to sync times ${result.message}`);
       }
     }
 
-    if (localRunners) {
+    if (localRunners && localRunnersId) {
       const runners = JSON.parse(localRunners);
 
       const response = await fetch('/submit-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'runners', data: runners, id: getClientID() }),
+        body: JSON.stringify({ type: 'runners', data: runners, id: localRunnersId }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.status === 'success') {
-        localStorage.removeItem('runners');
+        localStorage.removeItem('server-runners');
+        localStorage.removeItem('server-runners-client');
         console.log('Successfully synced runners to server');
       } else {
         console.log(`Failed to sync times ${result.message}`);
@@ -164,7 +199,7 @@ async function syncLocalStorageData() {
       const result = await response.json();
 
       if (response.ok && result.status === 'success') {
-        localStorage.removeItem('result');
+        localStorage.removeItem('results');
         console.log('Successfully synced results to server');
       } else {
         console.log(`Failed to sync results: ${result.message}`);
@@ -178,4 +213,5 @@ async function syncLocalStorageData() {
 window.addEventListener('load', () => {
   registerServiceWorker();
   isApplicationOffline();
+  loadLocalStorageData();
 });
