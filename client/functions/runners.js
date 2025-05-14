@@ -68,10 +68,6 @@ export async function submitRunnersRecords() {
 
     console.log(`Runners submitted successfully: ${result}`);
     errorMessageDisplay('Runners submitted successfully:', 'success');
-
-    // if (localStorage.getItem('runners')) {
-    //   localStorage.removeItem('runners');
-    // }
   } catch (error) {
     console.error(`Error: ${error}`);
     errorMessageDisplay('Error submitting runner, it is currently stored locally, please try again out of offline mode', 'error');

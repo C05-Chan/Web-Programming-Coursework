@@ -105,23 +105,12 @@ async function addResult(req, res) {
   try {
     const { results } = req.body;
 
-    const times = [];
-    const runners = [];
 
-    for (const result of results) {
-      times.push(result.time);
-      runners.push({
-        id: result.id,
-        name: result.name,
-        position: result.position,
-      });
-    }
+    const data = await db.addRaceResult(results);
 
-    const result = await db.addRaceResult(times, runners);
-
-    if (!result.success) {
+    if (!data.success) {
       console.log('Unable to save results.');
-      return res.status(500).json({ status: 'error', message: `Unable to save the results. Error: ${result.error}` });
+      return res.status(500).json({ status: 'error', message: `Unable to save the results. Error: ${data.error}` });
     }
 
     console.log('Successfully saved race results');
@@ -142,7 +131,7 @@ async function getResults(req, res) {
     }
 
     console.log('Successfully got race result!');
-    res.json({ status: 'success', times: result.times || [], runners: result.runners || [] });
+    res.json({ status: 'success', results: result.results });
   } catch (error) {
     console.error(`Server error: ${error}`);
     res.status(500).json({ status: 'error', message: 'Could not get race result due to server error' });

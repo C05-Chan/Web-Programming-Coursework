@@ -125,13 +125,13 @@ async function deleteRaceData(type, id) {
 }
 
 // Race Results //
-export async function addRaceResult(timesArray, runnersArray) {
+export async function addRaceResult(resultsArray) {
   try {
     const db = await dbConn;
 
     await db.run(
-      'INSERT OR REPLACE INTO race_results (id, times_array, runners_array, time) VALUES (1, ?, ?, datetime("now"))',
-      [JSON.stringify(timesArray), JSON.stringify(runnersArray)],
+      'INSERT OR REPLACE INTO race_results (id, results_array, time) VALUES (1, ?, datetime("now"))',
+      [JSON.stringify(resultsArray)],
     );
 
     console.log('Created race results!');
@@ -150,11 +150,11 @@ export async function getRaceResults() {
 
     if (!results) {
       console.log('No results!');
-      return { success: true, error: 'No results!', times: [], runners: [] };
+      return { success: true, error: 'No results!', results: [] };
     }
 
     console.log('Retrieved race results!');
-    return { success: true, times: JSON.parse(results.times_array), runners: JSON.parse(results.runners_array) };
+    return { success: true, results: JSON.parse(results.results_array) };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
     return { success: false, error: 'Unable to retrieve race results' };

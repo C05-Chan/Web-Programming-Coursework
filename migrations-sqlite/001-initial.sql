@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS race_data (
 
 CREATE TABLE IF NOT EXISTS race_results (
     id INTEGER PRIMARY KEY CHECK (id = 1),
-    times_array TEXT NOT NULL DEFAULT '[]',
-    runners_array TEXT NOT NULL DEFAULT '[]',
+    results_array TEXT NOT NULL DEFAULT '[]',
     time DATETIME
 );

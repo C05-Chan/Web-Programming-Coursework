@@ -47,7 +47,7 @@ export function hideElement(e) {
 }
 
 export function getClientID() {
-  let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device //
+  let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device. Otherwise, if multiple device, use local storage //
 
   if (!clientID) {
     clientID = 'clientID-' + Math.random().toString(36).substring(2, 14);

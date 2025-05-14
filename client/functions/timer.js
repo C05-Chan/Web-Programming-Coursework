@@ -103,10 +103,6 @@ export async function submitTimeRecords() {
     console.log(`Times submitted successfully: ${result}`);
     errorMessageDisplay('Times submitted successfully:', 'success');
 
-    // if (localStorage.getItem('times')) {
-    //   localStorage.removeItem('times');
-    // }
-
     hideElement(document.querySelector('.stopwatch'));
   } catch (error) {
     console.log(`Error: ${error}`);

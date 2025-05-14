@@ -4,8 +4,11 @@ import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeReco
 import { addRunner, submitRunnersRecords } from './functions/runners.js';
 import { runnersResultsBtn } from './functions/results.js';
 
+
 el.runners_results.addEventListener('click', () => {
   clearContent();
+  hideElement(el.volunteer_nav);
+  hideElement(el.create_results);
   runnersResultsBtn();
 });
 
@@ -13,7 +16,6 @@ el.admin_view.addEventListener('click', () => {
   clearContent();
 
   showElement(el.admin_container);
-  showElement(el.create_results);
   hideElement(el.volunteer_nav);
   adminBtn();
 });
@@ -30,7 +32,6 @@ el.create_results.addEventListener('click', () => {
 el.submit_results.addEventListener('click', generateResults);
 
 el.cancel_create_results.addEventListener('click', () => {
-  showElement(el.create_results);
   hideElement(el.create_results_buttons);
 
   adminBtn();
@@ -93,7 +94,6 @@ async function registerServiceWorker() {
 
 async function isApplicationOffline() {
   if (!navigator.onLine) { // Check for internet connection //
-    console.log('offline');
     return 'offline';
   }
 
@@ -101,11 +101,9 @@ async function isApplicationOffline() {
     const response = await fetch('http://localhost:8080', { method: 'HEAD' });
     if (response.ok) {
       await syncLocalStorageData(); // This would return true if the status code is 200 //
-      console.log('online');
       return 'online';
     }
   } catch (error) {
-    console.log('offline - catch');
     return 'offline';
   }
 }
@@ -178,7 +176,6 @@ async function syncLocalStorageData() {
 }
 
 window.addEventListener('load', () => {
-  console.log('poo');
   registerServiceWorker();
   isApplicationOffline();
 });

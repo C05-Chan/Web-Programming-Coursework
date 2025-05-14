@@ -65,6 +65,7 @@ export async function adminBtn() {
     });
 
     tableBody.appendChild(row);
+    showElement(el.create_results);
   }
 }
 // Modify Times //
@@ -392,16 +393,19 @@ export async function generateResults() {
     return;
   }
 
+  timesArrays.sort();
+  runnersArrays.sort((a, b) => a.position - b.position); // This sorts the runner array based on the inputted positio by comparing //
 
-  for (let i = 0; i < timesArrays.length; i++) {
-    if (i < runnersArrays.length) {
-      results.push({
-        position: runnersArrays[i].position,
-        name: runnersArrays[i].name,
-        time: timesArrays[i],
-        id: runnersArrays[i].id,
-      });
-    }
+  const minLength = Math.min(timesArrays.length, runnersArrays.length); // this gets the lengh of the shorted array //
+
+  for (let i = 0; i < minLength; i++) {
+    results.push({
+      position: runnersArrays[i].position,
+      name: runnersArrays[i].name,
+      time: timesArrays[i],
+      id: runnersArrays[i].id,
+    });
+    console.log(results);
   }
 
   try {
@@ -413,13 +417,14 @@ export async function generateResults() {
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || result.status !== 'success') {
       errorMessageDisplay(result.message, 'error');
       localStorage.setItem('results', JSON.stringify(results));
       return;
     }
     errorMessageDisplay('Results created successfully!', 'success');
     el.runners_results.click();
+    hideElement(el.create_results_buttons);
   } catch (error) {
     console.error('Error creating results:', error);
     errorMessageDisplay('Error creating results', 'error');
