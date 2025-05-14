@@ -6,14 +6,12 @@ let recordedTimes = [];
 
 function updateTimer() {
   currentMilliseconds++;
-  const hours = Math.floor(currentMilliseconds / 3600000);
-  const minutes = Math.floor((currentMilliseconds % 3600000) / 60000);
-  const seconds = Math.floor((currentMilliseconds % 60000) / 1000);
+  const hours = Math.floor(currentMilliseconds / 3600000); // Calculate the hrs to the nearest whole number //
+  const minutes = Math.floor((currentMilliseconds % 3600000) / 60000); // Calculate the remaining minutes to the nearest whole number //
+  const seconds = Math.floor((currentMilliseconds % 60000) / 1000); // Calculate the remaining minutes to the nearest whole number //
   const ms = currentMilliseconds % 1000;
 
   el.stopwatch_display.textContent = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${ms < 10 ? '00' + ms : ms < 100 ? '0' + ms : ms}`;
-
-  localStorage.setItem('timerDisplay', el.stopwatch_display.textContent);
 }
 
 export function startTimer() {
@@ -116,7 +114,6 @@ export async function submitTimeRecords() {
     console.log(`Times submitted successfully: ${result}`);
     errorMessageDisplay('Times submitted successfully:', 'success');
     localStorage.setItem('times', JSON.stringify(recordedTimes));
-    localStorage.setItem('submitted-times', 'true');
 
 
     hideElement(document.querySelector('.stopwatch'));
@@ -127,6 +124,7 @@ export async function submitTimeRecords() {
     localStorage.setItem('server-times', JSON.stringify(recordedTimes));
     localStorage.setItem('server-times-client', clientId);
   }
+  localStorage.setItem('submitted-times', 'true');
 }
 
 export function clearTimes() {
@@ -137,6 +135,7 @@ export function clearTimes() {
   el.times_list.innerHTML = '';
   localStorage.removeItem('times');
   localStorage.removeItem('submitted-times');
+  localStorage.removeItem('timerDisplay');
   removeClientID();
 
   showElement(document.querySelector('.stopwatch'));

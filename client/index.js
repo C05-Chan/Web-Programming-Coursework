@@ -100,7 +100,6 @@ async function registerServiceWorker() {
 function loadLocalStorageData() {
   const savedTimes = localStorage.getItem('times');
   const savedRunners = localStorage.getItem('runners');
-  const savedTimerDisplay = localStorage.getItem('timerDisplay');
 
   if (savedTimes) {
     const list = JSON.parse(localStorage.getItem('times'));
@@ -112,12 +111,6 @@ function loadLocalStorageData() {
     const list = JSON.parse(localStorage.getItem('runners'));
     displayRecordedRunners(list);
     checkRunnersSubmission();
-  }
-
-  if (savedTimerDisplay) {
-    el.stopwatch_display.textContent = savedTimerDisplay;
-    hideElement(el.start);
-    showElement(el.resume);
   }
 }
 

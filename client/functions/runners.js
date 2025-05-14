@@ -74,7 +74,6 @@ export async function submitRunnersRecords() {
     console.log(`Runners submitted successfully: ${result}`);
     errorMessageDisplay('Runners submitted successfully:', 'success');
     localStorage.setItem('runners', JSON.stringify(recordedRunners));
-    localStorage.setItem('submitted-runners', 'true');
 
     hideElement(document.querySelector('.runners-input-container'));
     showElement(el.clear_runners);
@@ -84,6 +83,7 @@ export async function submitRunnersRecords() {
     localStorage.setItem('server-runners', JSON.stringify(recordedRunners));
     localStorage.setItem('server-runners-client', clientId);
   }
+  localStorage.setItem('submitted-runners', 'true');
 }
 
 export function clearRunners() {

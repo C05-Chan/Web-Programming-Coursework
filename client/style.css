@@ -68,6 +68,6 @@ h1 {
     display: none;
 }
 
-.section-container {
+.section-container, .clear {
     display: none;
 }
