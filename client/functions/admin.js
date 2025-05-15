@@ -1,4 +1,5 @@
 import { el, showElement, hideElement, errorMessageDisplay, clearContent, getRunners } from './common.js';
+import { runnersResultsBtn } from './results.js';
 
 let updateList = [];
 let selectedClientId = null;
@@ -46,6 +47,9 @@ export async function adminBtn() {
     }
 
     row.addEventListener('click', () => {
+      hideElement(el.create_results);
+      showElement(el.manage_back);
+
       if (item.data_type === 'times') {
         clearContent();
         showElement(el.time_management_container);
@@ -394,9 +398,9 @@ export async function generateResults() {
   }
 
   timesArrays.sort();
-  runnersArrays.sort((a, b) => a.position - b.position); // This sorts the runner array based on the inputted positio by comparing //
+  runnersArrays.sort((a, b) => a.position - b.position); // This sorts the runner array based on the inputted position by comparing //
 
-  const minLength = Math.min(timesArrays.length, runnersArrays.length); // this gets the lengh of the shorted array //
+  const minLength = Math.min(timesArrays.length, runnersArrays.length); // this gets the length of the shorted array //
 
   for (let i = 0; i < minLength; i++) {
     results.push({
@@ -423,7 +427,7 @@ export async function generateResults() {
       return;
     }
     errorMessageDisplay('Results created successfully!', 'success');
-    el.runners_results.click();
+    runnersResultsBtn();
     hideElement(el.create_results_buttons);
   } catch (error) {
     console.error('Error creating results:', error);

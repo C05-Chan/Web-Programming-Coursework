@@ -1,4 +1,4 @@
-import { el, errorMessageDisplay, getClientID, getRunners, hideElement, removeClientID, showElement } from './common.js';
+import { el, errorMessageDisplay, getClientID, getRunners, hideElement, removeClientID, showElement, errorMessageReset } from './common.js';
 
 let recordedRunners = [];
 
@@ -46,7 +46,8 @@ export function displayRecordedRunners(list) {
 }
 
 export async function submitRunnersRecords() {
-  errorMessageDisplay('', null);
+  errorMessageReset();
+
 
   if (recordedRunners.length === 0) {
     errorMessageDisplay('No runners recorded to submit', 'error');
@@ -91,9 +92,12 @@ export function clearRunners() {
   el.runners_list.innerHTML = '';
   localStorage.removeItem('runners');
   localStorage.removeItem('submitted-runners');
+  errorMessageReset();
   removeClientID();
+  el.runner_ID.value = '';
+  el.runner_position.value = '';
 
-  showElement(document.querySelector('.runners-input-container'));
+  document.querySelector('.runners-input-container').style.display = 'grid';
   hideElement(el.clear_runners);
 }
 

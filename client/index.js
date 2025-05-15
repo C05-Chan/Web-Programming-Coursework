@@ -4,20 +4,24 @@ import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeReco
 import { addRunner, submitRunnersRecords, clearRunners, displayRecordedRunners, checkRunnersSubmission } from './functions/runners.js';
 import { runnersResultsBtn } from './functions/results.js';
 
+el.nav_dropdown.addEventListener('change', function () {
+  const selected = el.nav_dropdown.value;
 
-el.runners_results.addEventListener('click', () => {
-  clearContent();
-  hideElement(el.volunteer_nav);
-  hideElement(el.create_results);
-  runnersResultsBtn();
-});
-
-el.admin_view.addEventListener('click', () => {
-  clearContent();
-
-  showElement(el.admin_container);
-  hideElement(el.volunteer_nav);
-  adminBtn();
+  if (selected === 'runners-results') {
+    clearContent();
+    hideElement(el.volunteer_nav);
+    hideElement(el.create_results);
+    runnersResultsBtn();
+  } else if (selected === 'admin-view') {
+    clearContent();
+    showElement(el.admin_container);
+    hideElement(el.volunteer_nav);
+    adminBtn();
+  } else if (selected === 'volunteer-view') {
+    clearContent();
+    showElement(el.volunteer_nav);
+    hideElement(el.create_results);
+  }
 });
 
 el.create_results.addEventListener('click', () => {
@@ -37,6 +41,14 @@ el.cancel_create_results.addEventListener('click', () => {
   adminBtn();
 });
 
+el.manage_back.addEventListener('click', () => {
+  hideElement(el.manage_back);
+  clearContent();
+  showElement(el.admin_container);
+  hideElement(el.volunteer_nav);
+  adminBtn();
+});
+
 el.modify_times.addEventListener('click', () => {
   showElement(el.modify_times_container);
   hideElement(el.modify_times);
@@ -45,6 +57,13 @@ el.modify_times.addEventListener('click', () => {
 
 el.add_time.addEventListener('click', addNewTime);
 el.times_popup_done.addEventListener('click', popupTimeDone);
+
+el.time_input.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    popupTimeDone();
+  }
+});
+
 el.times_popup_cancel.addEventListener('click', popupTimeCancel);
 el.save_times.addEventListener('click', saveNewTimes);
 el.clear_times.addEventListener('click', clearTimes);
@@ -56,16 +75,37 @@ el.modify_runners.addEventListener('click', () => {
 });
 
 el.add_runner.addEventListener('click', addNewRunner);
+
+el.runner_position.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    el.runner_ID.focus();
+  }
+});
+
+el.runner_ID.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    addRunner();
+  }
+});
+
 el.runner_popup_done.addEventListener('click', popupRunnerDone);
+
+el.edit_runner_position.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    el.edit_runner_id.focus();
+  }
+});
+
+el.edit_runner_id.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    popupRunnerDone();
+  }
+});
+
 el.runner_popup_cancel.addEventListener('click', popupRunnersCancel);
 el.save_runners.addEventListener('click', saveNewRunners);
 el.clear_runners.addEventListener('click', clearRunners);
 
-
-el.volunteer_view.addEventListener('click', () => {
-  showElement(el.volunteer_nav);
-  hideElement(el.create_results);
-});
 
 el.timer.addEventListener('click', () => {
   clearContent();
@@ -100,14 +140,16 @@ async function registerServiceWorker() {
 function loadLocalStorageData() {
   const savedTimes = localStorage.getItem('times');
   const savedRunners = localStorage.getItem('runners');
+  const isTimeSubmitted = localStorage.getItem('submitted-times');
+  const isRunnerSubmitted = localStorage.getItem('submitted-runners');
 
-  if (savedTimes) {
+  if (savedTimes && isTimeSubmitted) {
     const list = JSON.parse(localStorage.getItem('times'));
     displayRecordedTimes(list);
     checkTimesSubmission();
   }
 
-  if (savedRunners) {
+  if (savedRunners && isRunnerSubmitted) {
     const list = JSON.parse(localStorage.getItem('runners'));
     displayRecordedRunners(list);
     checkRunnersSubmission();

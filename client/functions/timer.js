@@ -1,22 +1,36 @@
-import { el, showElement, hideElement, errorMessageDisplay, getClientID, removeClientID } from './common.js';
+import { el, showElement, hideElement, errorMessageDisplay, getClientID, removeClientID, errorMessageReset } from './common.js';
 
 let timerInterval;
-let currentMilliseconds = 0;
+let startTime;
 let recordedTimes = [];
 
 function updateTimer() {
-  currentMilliseconds++;
+  const currentMilliseconds = Date.now() - startTime; // + 82800000 + 3540000 + 50000 testing for up to 24hrs //
   const hours = Math.floor(currentMilliseconds / 3600000); // Calculate the hrs to the nearest whole number //
   const minutes = Math.floor((currentMilliseconds % 3600000) / 60000); // Calculate the remaining minutes to the nearest whole number //
   const seconds = Math.floor((currentMilliseconds % 60000) / 1000); // Calculate the remaining minutes to the nearest whole number //
   const ms = currentMilliseconds % 1000;
 
   el.stopwatch_display.textContent = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${ms < 10 ? '00' + ms : ms < 100 ? '0' + ms : ms}`;
+
+  if (currentMilliseconds >= 86400000) {
+    stopTimer();
+  }
+}
+
+function initialTimerButtonState() {
+  showElement(el.start);
+  hideElement(el.stop);
+  hideElement(el.resume);
+  hideElement(el.reset);
+  hideElement(el.record_time);
+  hideElement(el.submit_times);
+  hideElement(el.clear_times);
 }
 
 export function startTimer() {
   if (!timerInterval) {
-    currentMilliseconds = 0;
+    startTime = Date.now();
     timerInterval = setInterval(updateTimer, 1);
   }
   hideElement(el.start);
@@ -37,29 +51,25 @@ export function stopTimer() {
 
 export function resumeTimer() {
   if (!timerInterval) {
-    timerInterval = setInterval(updateTimer, 1);
+    timerInterval = setInterval(updateTimer, 10);
   }
 
   hideElement(el.resume);
   hideElement(el.reset);
   showElement(el.stop);
+  showElement(el.record_time);
 }
 
 export function resetTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
-  currentMilliseconds = 0;
+  startTime = null;
   recordedTimes = [];
 
   el.stopwatch_display.textContent = '00:00:00:000';
   el.times_list.innerHTML = '';
 
-  showElement(el.start);
-  hideElement(el.stop);
-  hideElement(el.resume);
-  hideElement(el.reset);
-  hideElement(el.record_time);
-  hideElement(el.submit_times);
+  initialTimerButtonState();
 }
 
 export function addTime() {
@@ -116,7 +126,7 @@ export async function submitTimeRecords() {
     localStorage.setItem('times', JSON.stringify(recordedTimes));
 
 
-    hideElement(document.querySelector('.stopwatch'));
+    hideElement(document.querySelector('.stopwatch-container'));
     showElement(el.clear_times);
   } catch (error) {
     console.log(`Error: ${error}`);
@@ -130,23 +140,27 @@ export async function submitTimeRecords() {
 export function clearTimes() {
   clearInterval(timerInterval);
   timerInterval = null;
-  currentMilliseconds = 0;
+  startTime = null;
   recordedTimes = [];
+  el.stopwatch_display.textContent = '00:00:00:000';
+
   el.times_list.innerHTML = '';
   localStorage.removeItem('times');
   localStorage.removeItem('submitted-times');
-  localStorage.removeItem('timerDisplay');
+
+  errorMessageReset();
+  initialTimerButtonState();
   removeClientID();
 
-  showElement(document.querySelector('.stopwatch'));
-  hideElement(el.clear_times);
+  document.querySelector('.stopwatch-container').style.display = 'grid';
+  hideElement(el.clearTimes);
 }
 
 export function checkTimesSubmission() {
   const isTimeSubmitted = localStorage.getItem('submitted-times');
 
   if (isTimeSubmitted) {
-    hideElement(document.querySelector('.stopwatch'));
+    hideElement(document.querySelector('.stopwatch-container'));
     showElement(el.clear_times);
     displayRecordedTimes(JSON.parse(localStorage.getItem('times')));
   }

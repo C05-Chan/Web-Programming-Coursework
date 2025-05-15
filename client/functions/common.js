@@ -47,7 +47,7 @@ export function hideElement(e) {
 }
 
 export function getClientID() {
-  let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device. Otherwise, if multiple device, use local storage //
+  let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device/browser. Otherwise, if multiple device/browser, use local storage //
 
   if (!clientID) {
     clientID = 'clientID-' + Math.random().toString(36).substring(2, 14);
@@ -71,4 +71,8 @@ export function errorMessageDisplay(message, type) {
   if (type === 'success' || type === 'error') {
     el.error_message.classList.add(type);
   }
+}
+
+export function errorMessageReset() {
+  el.error_message.textContent = '';
 }

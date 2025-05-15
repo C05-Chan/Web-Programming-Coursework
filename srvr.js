@@ -64,26 +64,6 @@ async function updateData(req, res) {
   }
 }
 
-async function getSpecificData(req, res) {
-  try {
-    const { type, id } = req.body;
-
-    const result = await db.getRaceData(type, id);
-
-    if (!result.success) {
-      console.log(`Unable to get ${type} data. Error: ${result.error}`);
-      return res.status(500).json({ status: 'error', message: `Unable to get ${type} all data` });
-    }
-
-    console.log(`Successfully got ${type} data!`);
-    res.json({ status: 'success', data: result.data });
-  } catch (error) {
-    console.error(`Server error: ${error}`);
-    res.status(500).json({ status: 'error', message: 'Server error' });
-  }
-}
-
-
 async function getAllData(req, res) {
   try {
     const result = await db.getAllRaceData();
@@ -152,7 +132,7 @@ app.post('/submit-data', submitData);
 app.post('/update-data', updateData);
 
 app.get('/get-all-data', getAllData);
-app.get('/get-type-data', getSpecificData);
+
 
 app.post('/add-race-result', addResult);
 app.get('/get-race-result', getResults);
