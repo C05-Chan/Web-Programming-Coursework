@@ -1,5 +1,3 @@
-
-
 export const el = {};
 
 const allIdElements = document.querySelectorAll('[id]');
@@ -31,7 +29,10 @@ export async function getRunners() {
 
 
 export function clearContent() {
-  if (el.error_message) el.error_message.textContent = '';
+  if (el.error_message) {
+    el.error_message.textContent = '';
+  }
+
   const contents = document.querySelectorAll('.section-container');
   for (const section of contents) {
     section.style.display = 'none';
@@ -50,7 +51,7 @@ export function getClientID() {
   let clientID = sessionStorage.getItem('clientID'); // Use session storage for testing on one device/browser. Otherwise, if multiple device/browser, use local storage //
 
   if (!clientID) {
-    clientID = 'clientID-' + Math.random().toString(36).substring(2, 14);
+    clientID = 'clientID-' + Math.random().toString(36).substring(2, 8);
     sessionStorage.setItem('clientID', clientID);
   }
   return clientID;

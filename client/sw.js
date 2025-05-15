@@ -7,13 +7,18 @@ self.addEventListener('install', event => {
       const cache = await caches.open(CACHE_NAME);
       await cache.addAll([
         './',
+        './functions/admin.js',
+        './functions/common.js',
+        './functions/results.js',
+        './functions/runners.js',
+        './functions/timer.js',
         './index.html',
         './index.js',
         './style.css',
         './manifest.json',
         './images/placeholder_192.png',
         './images/placeholder_512.png',
-        '../runnersDetails.csv',
+        './sw.js',
       ]);
     })());
 });

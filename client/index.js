@@ -1,26 +1,34 @@
-import { el, showElement, hideElement, clearContent } from './functions/common.js';
+import { el, showElement, hideElement, clearContent, errorMessageReset, errorMessageDisplay } from './functions/common.js';
 import { adminBtn, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners, createResult, generateResults } from './functions/admin.js';
 import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeRecords, clearTimes, displayRecordedTimes, checkTimesSubmission } from './functions/timer.js';
 import { addRunner, submitRunnersRecords, clearRunners, displayRecordedRunners, checkRunnersSubmission } from './functions/runners.js';
-import { runnersResultsBtn } from './functions/results.js';
+import { createCsv, downloadCsv, runnersResultsBtn, getResults } from './functions/results.js';
 
 el.nav_dropdown.addEventListener('change', function () {
   const selected = el.nav_dropdown.value;
 
-  if (selected === 'runners-results') {
+  if (selected === '') {
+    clearContent();
+    showElement(el.info);
+    hideElement(el.volunteer_nav);
+    hideElement(el.manage_back);
+  } else if (selected === 'runners-results') {
     clearContent();
     hideElement(el.volunteer_nav);
     hideElement(el.create_results);
     runnersResultsBtn();
+    hideElement(el.manage_back);
   } else if (selected === 'admin-view') {
     clearContent();
     showElement(el.admin_container);
     hideElement(el.volunteer_nav);
     adminBtn();
+    hideElement(el.manage_back);
   } else if (selected === 'volunteer-view') {
     clearContent();
     showElement(el.volunteer_nav);
     hideElement(el.create_results);
+    hideElement(el.manage_back);
   }
 });
 
@@ -29,6 +37,8 @@ el.create_results.addEventListener('click', () => {
   showElement(el.admin_container);
   hideElement(el.create_results);
   showElement(el.create_results_buttons);
+  hideElement(el.initial_message);
+  showElement(el.create_message);
 
   createResult();
 });
@@ -37,7 +47,9 @@ el.submit_results.addEventListener('click', generateResults);
 
 el.cancel_create_results.addEventListener('click', () => {
   hideElement(el.create_results_buttons);
-
+  showElement(el.initial_message);
+  hideElement(el.create_message);
+  errorMessageReset();
   adminBtn();
 });
 
@@ -46,6 +58,12 @@ el.manage_back.addEventListener('click', () => {
   clearContent();
   showElement(el.admin_container);
   hideElement(el.volunteer_nav);
+
+  hideElement(el.modify_runner_container);
+  hideElement(el.modify_times_container);
+
+  showElement(el.modify_runners);
+  showElement(el.modify_times);
   adminBtn();
 });
 
@@ -54,6 +72,7 @@ el.modify_times.addEventListener('click', () => {
   hideElement(el.modify_times);
   editTimesList();
 });
+
 
 el.add_time.addEventListener('click', addNewTime);
 el.times_popup_done.addEventListener('click', popupTimeDone);
@@ -130,6 +149,20 @@ el.record_runner.addEventListener('click', addRunner);
 el.submit_runners.addEventListener('click', submitRunnersRecords);
 
 
+// Add this with your other event listeners
+el.export_csv.addEventListener('click', async () => {
+  // Get fresh data when export is clicked
+  const data = await getResults();
+  if (!data || data.length === 0) {
+    errorMessageDisplay('No data available to export', 'error');
+    return;
+  }
+
+  const sortedResults = data.sort((a, b) => a.position - b.position);
+  const csvData = createCsv(sortedResults);
+  downloadCsv(csvData);
+});
+
 async function registerServiceWorker() {
   if (navigator.serviceWorker) {
     await navigator.serviceWorker.register('./sw.js');
@@ -155,6 +188,7 @@ function loadLocalStorageData() {
     checkRunnersSubmission();
   }
 }
+
 
 async function isApplicationOffline() {
   if (!navigator.onLine) { // Check for internet connection //

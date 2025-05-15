@@ -13,8 +13,8 @@
             <h1>RUN PARK</h1>
 
             <nav class="nav-container">
-                <label for="nav-dropdown">Choose View:</label>
                 <select id="nav-dropdown">
+                    <option value="">-- Choose View --</option>
                     <option value="runners-results">Runners</option>
                     <option value="volunteer-view">Volunteer</option>
                     <option value="admin-view">Admin</option>
@@ -27,7 +27,20 @@
             <button class ="nav-buttons" id="positions">Submission</button>
         </nav>
 
+
         <main class="main-container">
+            <article class="section-container" id="info">
+                <h2> Welcome to Run Park</h2>
+
+                <p>
+                    This app is for park runs, to record times and race submission 
+                    (runner's id and finished positions).
+                </p>
+            
+                <p>
+                    To get started, please select a view on the top right!
+                </p>
+            </article>
 
             <!-- Error Messages -->
             <section id="error-container">
@@ -37,12 +50,24 @@
             <!-- Admin view -->
             <section class="section-container" id="admin-container">
                 <h2>Race Data Overview</h2>
+                <p id="initial-message" style="display: none"> Click a row to modify!</p>
+                <p id="create-message"  style="display: none"> Select the results:</p>
+
+                <!-- Create Result -->
+                <section id="wrap-buttons">
+                    <button id="create-results" style="display: none">Create Results</button>
+                    <section id="create-results-buttons" style="display: none">
+                        <button type="submit" id="submit-results">Submit Results</button>
+                        <button id="cancel-create-results">Cancel</button>
+                    </section>
+                </section>
+
                 <table id="race-data-table">
                     <thead>
                         <tr>
                             <th>Client</th>
                             <th>Type</th>
-                            <th>Length</th>
+                            <th>Record</th>
                             <th>Time</th>
                         </tr>
                     </thead>
@@ -52,26 +77,15 @@
                 </table>
             </section>
 
-            <!-- Create Result -->
-            <button id="create-results" style="display: none">Create</button>
-            <section id="create-results-buttons" style="display: none">
-                <button type="submit" id="submit-results">Create Results</button>
-                <button id="cancel-create-results">Cancel</button>
-            </section>
-
             <button id="manage-back" style="display: none">Back</button>
             <!-- Manage Times - Admin -->
             <section class="section-container" id="time-management-container" style="display:none">
                 <h2>Manage Times</h2>
-                <button id="modify-times">Edit Times</button>
-
-                <ul class="position-times" id="times-management-list">
-                    <!--Times and position are added here -->
-                </ul>  
+                <button id="modify-times">Edit</button>
 
                 <section class="modify-view" id="modify-times-container" style="display:none">
-                    <button id="save-times" >Save Times</button> 
                     <button id="add-time" >Add Time</button>
+                    <button id="save-times" >Save Times</button> 
 
                     <section class="popup" id="time-popup" style="display:none">
 
@@ -82,20 +96,20 @@
                         <button id="times-popup-cancel">Cancel</button>
                     </section>
                 </section>
+
+                <ul class="position-times" id="times-management-list">
+                    <!--Times and position are added here -->
+                </ul>  
             </section>
 
             <!-- Manage Runners - Admin -->
             <section class="section-container" id="runner-management-container" style="display:none">
                 <h2>Manage Runners</h2>
                 <button id="modify-runners">Modify</button>
-
-                <ul class="position-times" id="runners-management-list">
-                <!-- Runners will be added here -->
-                </ul>  
-
                 <section class="modify-view" id="modify-runner-container" style="display:none">
-                    <button id="save-runners">Save Runners</button> 
                     <button id="add-runner">Add Runner</button>
+                    <button id="save-runners">Save Runners</button> 
+                    
                 
                     <section class="popup" id="runner-popup" style="display:none">
                         <label for="edit-runner-position">Position:</label>
@@ -108,6 +122,11 @@
                         <button id="runner-popup-cancel">Cancel</button>
                     </section>
                 </section>
+
+                <ul class="position-times" id="runners-management-list">
+                <!-- Runners will be added here -->
+                </ul>  
+
             </section>
 
             <!-- Stopwatch Timer - Volunteer -->
@@ -164,6 +183,7 @@
             <!-- Overall Results -->
             <section class="section-container" id="result-container">
                 <h2>Overall Result</h2>
+                <button id="export-csv" style="display: none">Download Results</button>
                 <table id="results-table">
                     <thead>
                         <tr>

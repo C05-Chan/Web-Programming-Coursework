@@ -27,13 +27,23 @@ async function getSubmission() {
 export async function adminBtn() {
   const data = await getSubmission();
   const tableBody = el.race_data_table.querySelector('tbody');
+  tableBody.innerHTML = '';
 
   if (data.length === 0) {
-    errorMessageDisplay('No data available to create results', 'error');
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.textContent = 'No results found!';
+    cell.colSpan = 4;
+    row.appendChild(cell);
+    tableBody.appendChild(row);
     return;
   }
 
   tableBody.innerHTML = '';
+  const headerRow = el.race_data_table.querySelector('thead tr');
+  if (headerRow.lastChild.textContent === 'Select') {
+    headerRow.removeChild(headerRow.lastChild);
+  }
 
   for (const item of data) {
     const row = document.createElement('tr');
@@ -70,6 +80,7 @@ export async function adminBtn() {
 
     tableBody.appendChild(row);
     showElement(el.create_results);
+    showElement(el.initial_message);
   }
 }
 // Modify Times //
@@ -103,11 +114,13 @@ export function editTimesList() {
 
     const editTime = document.createElement('button');
     editTime.textContent = 'Edit';
+    editTime.classList.add('edit-button');
 
     editTime.addEventListener('click', () => editSavedTime(time, i));
 
     const deleteTime = document.createElement('button');
     deleteTime.textContent = 'Delete';
+    deleteTime.classList.add('delete-button');
 
     deleteTime.addEventListener('click', () => deleteSavedTime(i));
 
@@ -223,12 +236,14 @@ export function editRunnersList() {
     runnerShown.textContent = `Position ${runner.position}: ${runner.name} (ID: ${runner.id})`;
 
     const editRunner = document.createElement('button');
-    editRunner.textContent = 'Edit Position';
+    editRunner.textContent = 'Edit';
+    editRunner.classList.add('edit-button');
 
     editRunner.addEventListener('click', () => editSavedRunner(runner, i));
 
     const deleteRunner = document.createElement('button');
     deleteRunner.textContent = 'Remove';
+    deleteRunner.classList.add('delete-button');
 
     deleteRunner.addEventListener('click', () => deleteSavedRunner(i));
 
@@ -337,6 +352,7 @@ export async function saveNewRunners() {
 export async function createResult() {
   const data = await getSubmission();
   const tableBody = el.race_data_table.querySelector('tbody');
+  const headerRow = el.race_data_table.querySelector('thead tr');
 
   if (data.length === 0) {
     errorMessageDisplay('No data available to create results', 'error');
@@ -344,6 +360,10 @@ export async function createResult() {
   }
 
   tableBody.innerHTML = '';
+
+  const selectHeader = document.createElement('th');
+  selectHeader.textContent = 'Select';
+  headerRow.appendChild(selectHeader);
 
   for (const item of data) {
     const row = document.createElement('tr');
@@ -428,10 +448,11 @@ export async function generateResults() {
     }
     errorMessageDisplay('Results created successfully!', 'success');
     runnersResultsBtn();
+    showElement(el.manage_back);
     hideElement(el.create_results_buttons);
   } catch (error) {
     console.error('Error creating results:', error);
-    errorMessageDisplay('Error creating results', 'error');
+    errorMessageDisplay('Error submitting times, it is currently stored locally, please try again out of offline mode', 'error');
     localStorage.setItem('results', JSON.stringify(results));
   }
 }
