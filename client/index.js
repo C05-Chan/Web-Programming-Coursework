@@ -4,8 +4,9 @@ import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeReco
 import { addRunner, submitRunnersRecords, clearRunners, displayRecordedRunners, checkRunnersSubmission } from './functions/runners.js';
 import { createCsv, downloadCsv, runnersResultsBtn, getResults } from './functions/results.js';
 
-el.nav_dropdown.addEventListener('change', function () {
+function handleNavChange() {
   const selected = el.nav_dropdown.value;
+  sessionStorage.setItem('selectedView', el.nav_dropdown.value);
 
   if (selected === '') {
     clearContent();
@@ -30,6 +31,12 @@ el.nav_dropdown.addEventListener('change', function () {
     hideElement(el.create_results);
     hideElement(el.manage_back);
   }
+}
+
+el.nav_dropdown.addEventListener('change', handleNavChange);
+
+el.admin_reload.addEventListener('click', () => {
+  window.location.reload();
 });
 
 el.create_results.addEventListener('click', () => {
@@ -149,9 +156,11 @@ el.record_runner.addEventListener('click', addRunner);
 el.submit_runners.addEventListener('click', submitRunnersRecords);
 
 
-// Add this with your other event listeners
+el.results_reload.addEventListener('click', () => {
+  window.location.reload();
+});
+
 el.export_csv.addEventListener('click', async () => {
-  // Get fresh data when export is clicked
   const data = await getResults();
   if (!data || data.length === 0) {
     errorMessageDisplay('No data available to export', 'error');
@@ -283,4 +292,16 @@ window.addEventListener('load', () => {
   registerServiceWorker();
   isApplicationOffline();
   loadLocalStorageData();
+
+  const savedView = sessionStorage.getItem('selectedView');
+  if (savedView) {
+    el.nav_dropdown.value = savedView;
+    handleNavChange();
+  }
 });
+
+// DON NOT ADD THIS! //
+
+// setInterval(function () {
+//   window.location.reload();
+// }, 10000);

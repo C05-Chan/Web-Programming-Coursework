@@ -2,16 +2,25 @@ import { el, showElement, hideElement, errorMessageDisplay, getClientID, removeC
 
 let timerInterval;
 let startTime;
+let currentMilliseconds = 0;
 let recordedTimes = [];
+let isRunning = false;
 
 function updateTimer() {
-  const currentMilliseconds = Date.now() - startTime; // + 82800000 + 3540000 + 50000 testing for up to 24hrs //
-  const hours = Math.floor(currentMilliseconds / 3600000); // Calculate the hrs to the nearest whole number //
-  const minutes = Math.floor((currentMilliseconds % 3600000) / 60000); // Calculate the remaining minutes to the nearest whole number //
-  const seconds = Math.floor((currentMilliseconds % 60000) / 1000); // Calculate the remaining minutes to the nearest whole number //
-  const ms = currentMilliseconds % 1000;
+  const currentTime = Date.now();
+  currentMilliseconds = currentTime - startTime;
 
-  el.stopwatch_display.textContent = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${ms < 10 ? '00' + ms : ms < 100 ? '0' + ms : ms}`;
+  let hours = Math.floor(currentMilliseconds / 3600000); // Calculate the hrs to the nearest whole number //
+  let minutes = Math.floor((currentMilliseconds % 3600000) / 60000); // Calculate the remaining minutes to the nearest whole number //
+  let seconds = Math.floor((currentMilliseconds % 60000) / 1000); // Calculate the remaining minutes to the nearest whole number //
+  let ms = currentMilliseconds % 1000;
+
+  hours = String(hours).padStart(2, '0');
+  minutes = String(minutes).padStart(2, '0');
+  seconds = String(seconds).padStart(2, '0');
+  ms = String(ms).padStart(3, '0');
+
+  el.stopwatch_display.textContent = `${hours}:${minutes}:${seconds}:${ms}`;
 
   if (currentMilliseconds >= 86400000) {
     stopTimer();
@@ -29,10 +38,12 @@ function initialTimerButtonState() {
 }
 
 export function startTimer() {
-  if (!timerInterval) {
-    startTime = Date.now();
-    timerInterval = setInterval(updateTimer, 1);
+  if (!timerInterval && !isRunning) {
+    timerInterval = setInterval(updateTimer, 10);
+    startTime = Date.now() - currentMilliseconds;
+    isRunning = true;
   }
+
   hideElement(el.start);
   showElement(el.stop);
   showElement(el.record_time);
@@ -40,8 +51,12 @@ export function startTimer() {
 }
 
 export function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
+  if (isRunning) {
+    clearInterval(timerInterval);
+    currentMilliseconds = Date.now() - startTime;
+    timerInterval = null;
+    isRunning = false;
+  }
 
   hideElement(el.stop);
   hideElement(el.record_time);
@@ -50,8 +65,10 @@ export function stopTimer() {
 }
 
 export function resumeTimer() {
-  if (!timerInterval) {
+  if (!timerInterval && !isRunning) {
+    startTime = Date.now() - currentMilliseconds;
     timerInterval = setInterval(updateTimer, 10);
+    isRunning = true;
   }
 
   hideElement(el.resume);
@@ -65,6 +82,8 @@ export function resetTimer() {
   timerInterval = null;
   startTime = null;
   recordedTimes = [];
+  currentMilliseconds = 0;
+  isRunning = false;
 
   el.stopwatch_display.textContent = '00:00:00:000';
   el.times_list.innerHTML = '';

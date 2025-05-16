@@ -38,6 +38,9 @@
                 </p>
             
                 <p>
+                    Please use offline/ airplane mode whilst recording time and runners submissions.
+                </p>
+                <p>
                     To get started, please select a view on the top right!
                 </p>
             </article>
@@ -53,9 +56,12 @@
                 <p id="initial-message" style="display: none"> Click a row to modify!</p>
                 <p id="create-message"  style="display: none"> Select the results:</p>
 
+
                 <!-- Create Result -->
                 <section id="wrap-buttons">
+                    <button id="admin-reload">Reload</button>
                     <button id="create-results" style="display: none">Create Results</button>
+
                     <section id="create-results-buttons" style="display: none">
                         <button type="submit" id="submit-results">Submit Results</button>
                         <button id="cancel-create-results">Cancel</button>
@@ -183,6 +189,7 @@
             <!-- Overall Results -->
             <section class="section-container" id="result-container">
                 <h2>Overall Result</h2>
+                <button id="results-reload" >Reload</button>
                 <button id="export-csv" style="display: none">Download Results</button>
                 <table id="results-table">
                     <thead>

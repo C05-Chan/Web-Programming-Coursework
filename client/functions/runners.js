@@ -4,6 +4,7 @@ let recordedRunners = [];
 
 export async function addRunner() {
   el.error_message.textContent = '';
+  let targetedRunner = null;
   const idNumber = el.runner_ID.value;
   const position = el.runner_position.value;
 
@@ -18,7 +19,13 @@ export async function addRunner() {
   }
 
   const runnersData = await getRunners();
-  const targetedRunner = runnersData.find(runner => runner[0] === idNumber);
+
+  for (let i = 0; i < runnersData.length; i++) {
+    if (runnersData[i][0] === idNumber && targetedRunner === null) {
+      targetedRunner = runnersData[i];
+    }
+  }
+
 
   if (!targetedRunner) {
     errorMessageDisplay('Runner ID not found', 'error');
@@ -103,6 +110,7 @@ export function clearRunners() {
 
 export function checkRunnersSubmission() {
   const isRunnersSubmitted = localStorage.getItem('submitted-runners');
+
   if (isRunnersSubmitted) {
     hideElement(document.querySelector('.runners-input-container'));
     showElement(el.clear_runners);

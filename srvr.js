@@ -121,9 +121,6 @@ async function getResults(req, res) {
 async function testClear() {
   const result = await db.clearDBData('race_data');
   console.log('Clear result:', result);
-
-  const result2 = await db.clearDBData('race_results');
-  console.log('Clear result:', result2);
 }
 
 testClear();
@@ -132,7 +129,6 @@ app.post('/submit-data', submitData);
 app.post('/update-data', updateData);
 
 app.get('/get-all-data', getAllData);
-
 
 app.post('/add-race-result', addResult);
 app.get('/get-race-result', getResults);

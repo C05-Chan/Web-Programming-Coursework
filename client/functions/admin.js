@@ -39,6 +39,8 @@ export async function adminBtn() {
     return;
   }
 
+  showElement(el.create_results);
+  showElement(el.initial_message);
   tableBody.innerHTML = '';
   const headerRow = el.race_data_table.querySelector('thead tr');
   if (headerRow.lastChild.textContent === 'Select') {
@@ -79,8 +81,6 @@ export async function adminBtn() {
     });
 
     tableBody.appendChild(row);
-    showElement(el.create_results);
-    showElement(el.initial_message);
   }
 }
 // Modify Times //
@@ -257,10 +257,14 @@ export function editRunnersList() {
 
 async function editSavedRunner(runner, index) {
   editItem = index;
+  let targetedRunner = null;
 
   const runnersData = await getRunners();
-  console.log(runnersData);
-  const targetedRunner = runnersData.find(r => r[0] === runner.id);
+  for (let i = 0; i < runnersData.length; i++) {
+    if (runnersData[i][0] === runner.id && targetedRunner === null) {
+      targetedRunner = runnersData[i];
+    }
+  }
 
   el.edit_runner_id.value = targetedRunner[0];
   el.edit_runner_position.value = runner.position;
@@ -279,6 +283,7 @@ export function addNewRunner() {
 }
 
 export async function popupRunnerDone() {
+  let targetedRunner = null;
   const newPosition = el.edit_runner_position.value.trim();
   const newID = el.edit_runner_id.value.trim();
 
@@ -287,13 +292,16 @@ export async function popupRunnerDone() {
     return;
   }
   const runnersData = await getRunners();
-  const targetedRunner = runnersData.find(runner => runner[0] === newID);
+  for (let i = 0; i < runnersData.length; i++) {
+    if (runnersData[i][0] === newID && targetedRunner === null) {
+      targetedRunner = runnersData[i];
+    }
+  }
 
   if (!targetedRunner) {
     errorMessageDisplay('Runner ID not found', 'error');
     return;
   }
-
 
   const runnerName = `${targetedRunner[1]} ${targetedRunner[2]}`;
   const newRunnersInfo = { id: newID, name: runnerName, position: newPosition };
@@ -355,7 +363,12 @@ export async function createResult() {
   const headerRow = el.race_data_table.querySelector('thead tr');
 
   if (data.length === 0) {
-    errorMessageDisplay('No data available to create results', 'error');
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.textContent = 'No results found!';
+    cell.colSpan = 4;
+    row.appendChild(cell);
+    tableBody.appendChild(row);
     return;
   }
 
