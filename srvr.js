@@ -33,11 +33,10 @@ async function submitData(req, res) {
     const result = await db.addRaceData(type, data, id);
 
     if (!result.success) {
-      console.log(`Unable to save ${type} data. Error: ${result.error}`);
+      console.error(`Unable to save ${type} data. Error: ${result.error}`);
       return res.status(500).json({ status: 'error', message: `Unable to save ${type} data` });
     }
 
-    console.log(`${type} data submitted successfully!`);
     return res.status(200).json({ status: 'success', message: `${type} data submitted successfully!` });
   } catch (error) {
     console.error(`Server error: ${error}`);
@@ -52,11 +51,10 @@ async function updateData(req, res) {
     const result = await db.updateRaceData(type, data, id);
 
     if (!result.success) {
-      console.log(`Unable to update ${type} data. Error: ${result.error}`);
+      console.error(`Unable to update ${type} data. Error: ${result.error}`);
       return res.status(500).json({ status: 'error', message: `Unable to update ${type} data` });
     }
 
-    console.log(`Updated ${type} data!`);
     return res.status(200).json({ status: 'success', message: `The ${type} data updated successfully` });
   } catch (error) {
     console.error(`Server error: ${error}`);
@@ -69,11 +67,10 @@ async function getAllData(req, res) {
     const result = await db.getAllRaceData();
 
     if (!result.success) {
-      console.log(`Unable to get all data. Error: ${result.error}`);
+      console.error(`Unable to get all data. Error: ${result.error}`);
       return res.status(500).json({ status: 'error', message: 'Unable to get all data' });
     }
 
-    console.log('Successfully got all data!');
     res.json({ status: 'success', data: result.data });
   } catch (error) {
     console.error(`Server error: ${error}`);
@@ -89,11 +86,10 @@ async function addResult(req, res) {
     const data = await db.addRaceResult(results);
 
     if (!data.success) {
-      console.log('Unable to save results.');
+      console.error('Unable to save results.');
       return res.status(500).json({ status: 'error', message: `Unable to save the results. Error: ${data.error}` });
     }
 
-    console.log('Successfully saved race results');
     return res.json({ status: 'success', message: 'Race results saved successfully' });
   } catch (error) {
     console.error('Error saving race results:', error);
@@ -106,11 +102,10 @@ async function getResults(req, res) {
     const result = await db.getRaceResults();
 
     if (!result.success) {
-      console.log(`Unable to get race result. Error: ${result.error}`);
+      console.error(`Unable to get race result. Error: ${result.error}`);
       return res.status(500).json({ status: 'error', message: 'Unable to get race results' });
     }
 
-    console.log('Successfully got race result!');
     res.json({ status: 'success', results: result.results });
   } catch (error) {
     console.error(`Server error: ${error}`);
@@ -119,8 +114,7 @@ async function getResults(req, res) {
 }
 
 async function testClear() {
-  const result = await db.clearDBData('race_data');
-  console.log('Clear result:', result);
+  await db.clearDBData('race_data');
 }
 
 testClear();

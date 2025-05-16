@@ -79,7 +79,6 @@ export async function submitRunnersRecords() {
       return;
     }
 
-    console.log(`Runners submitted successfully: ${result}`);
     errorMessageDisplay('Runners submitted successfully:', 'success');
     localStorage.setItem('runners', JSON.stringify(recordedRunners));
 

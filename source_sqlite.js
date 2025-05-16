@@ -30,8 +30,6 @@ export async function addRaceData(type, data, id) {
     await db.run('INSERT INTO race_data (data_type, data_array, client_id, time) VALUES (?, ?, ?, datetime("now"))',
       [type, JSON.stringify(data), id],
     );
-
-    console.log(`Successfully added ${type} data!`);
     return { success: true, message: `Successfully added ${type} data!` };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -50,8 +48,6 @@ export async function updateRaceData(type, data, id) {
     await db.run('UPDATE race_data SET data_array = ? WHERE data_type = ? AND client_id = ?',
       [JSON.stringify(data), type, id],
     );
-
-    console.log(`Successfully updated ${type} data!`);
     return { success: true, message: `Successfully updated ${type} data!` };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -76,7 +72,6 @@ export async function getAllRaceData() {
         time: row.time,
       });
     }
-    console.log('Successfully retrieved the data!');
     return { success: true, data: formattedData };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -99,8 +94,6 @@ export async function getRaceData(type, id) {
         data_array: JSON.parse(row.data_array),
       });
     }
-
-    console.log(`Successfully retrieve ${type} data!`);
     return { success: true, data: formattedData };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -115,8 +108,6 @@ async function deleteRaceData(type, id) {
     await db.run('DELETE FROM race_data WHERE data_type = ? AND client_id = ?',
       [type, id],
     );
-
-    console.log(`Successfully deleted ${id}'s ${type} data!`);
     return { success: true, message: `Successfully deleted ${id}'s ${type} data!` };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -134,7 +125,6 @@ export async function addRaceResult(resultsArray) {
       [JSON.stringify(resultsArray)],
     );
 
-    console.log('Created race results!');
     return { success: true, message: 'Created race results!' };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -149,11 +139,10 @@ export async function getRaceResults() {
     const results = await db.get('SELECT * FROM race_results WHERE id = 1');
 
     if (!results) {
-      console.log('No results!');
+      console.error('No results!');
       return { success: true, error: 'No results!', results: [] };
     }
 
-    console.log('Retrieved race results!');
     return { success: true, results: JSON.parse(results.results_array) };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);
@@ -174,8 +163,6 @@ export async function clearDBData(table) {
     }
 
     await db.run(`DELETE FROM ${table}`);
-
-    console.log(`Successfully cleared table ${table}`);
     return { success: true, message: `Successfully cleared table ${table}` };
   } catch (error) {
     console.error(`Database Error: ${error.message}`);

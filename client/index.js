@@ -239,9 +239,8 @@ async function syncLocalStorageData() {
       if (response.ok && result.status === 'success') {
         localStorage.removeItem('server-times');
         localStorage.removeItem('server-times-client');
-        console.log('Successfully synced times to server');
       } else {
-        console.log(`Failed to sync times ${result.message}`);
+        console.error(`Failed to sync times ${result.message}`);
       }
     }
 
@@ -259,9 +258,8 @@ async function syncLocalStorageData() {
       if (response.ok && result.status === 'success') {
         localStorage.removeItem('server-runners');
         localStorage.removeItem('server-runners-client');
-        console.log('Successfully synced runners to server');
       } else {
-        console.log(`Failed to sync times ${result.message}`);
+        console.error(`Failed to sync times ${result.message}`);
       }
     }
 
@@ -278,9 +276,8 @@ async function syncLocalStorageData() {
 
       if (response.ok && result.status === 'success') {
         localStorage.removeItem('results');
-        console.log('Successfully synced results to server');
       } else {
-        console.log(`Failed to sync results: ${result.message}`);
+        console.error(`Failed to sync results: ${result.message}`);
       }
     }
   } catch (error) {

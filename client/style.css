@@ -302,7 +302,7 @@ tbody td {
   max-width: 100%;
 }
 
-#wrap-buttons {
+#create-first-nav {
   display: flex;
   justify-content: flex-start;
   gap: 10px;

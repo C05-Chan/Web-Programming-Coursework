@@ -13,7 +13,7 @@ async function getSubmission() {
 
     if (!response.ok || result.status !== 'success') {
       console.log(`Could not get the submissions. Error: ${result.error}`);
-      errorMessageDisplay('Could not get the data', 'error');
+      errorMessageDisplay('Could not get the submissions', 'error');
       return [];
     }
 
@@ -66,14 +66,14 @@ export async function adminBtn() {
         clearContent();
         showElement(el.time_management_container);
 
-        updateList = [...item.data_array];
+        updateList = item.data_array.slice();
         selectedClientId = item.client_id;
         displayTimesList();
       } else {
         clearContent();
         showElement(el.runner_management_container);
 
-        updateList = [...item.data_array];
+        updateList = item.data_array.slice();
         selectedClientId = item.client_id;
 
         displayRunnersList();
@@ -152,10 +152,11 @@ export function addNewTime() {
 
 export function popupTimeDone() {
   const newTime = el.time_input.value.trim();
-  if (!/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d):(\d{1,3})$/.test(newTime)) { // Checks if new time input is in the HH:MM:SS:MMM format //
+  if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]:\d{3}$/.test(newTime)) { // Checks if new time input is in the HH:MM:SS:MMM format //
     errorMessageDisplay('Invalid format. Please use hh:mm:ss:ms', 'error');
     return;
   }
+
 
   if (editItem !== null) {
     updateList[editItem] = newTime;
@@ -187,13 +188,12 @@ export async function saveNewTimes() {
 
     const result = await response.json();
     if (!response.ok) {
-      console.log(`Failed to update times ${result.message}`);
+      console.error(`Failed to update times ${result.message}`);
       errorMessageDisplay('Unable to update times', 'error');
       localStorage.setItem('times', JSON.stringify(updateList));
       return;
     }
 
-    console.log('Update to new times!');
     errorMessageDisplay('Times updated successfully', 'success');
 
     hideElement(el.modify_times_container);
@@ -336,13 +336,12 @@ export async function saveNewRunners() {
 
     const result = await response.json();
     if (!response.ok) {
-      console.log(`Failed to update runner ${result.message}`);
+      console.error(`Failed to update runner ${result.message}`);
       errorMessageDisplay('Unable to update times', 'error');
       localStorage.setItem('runners', JSON.stringify(updateList));
       return;
     }
 
-    console.log('Update to new runners!');
     errorMessageDisplay('Runners updated successfully', 'success');
 
     hideElement(el.modify_runner_container);
@@ -442,7 +441,6 @@ export async function generateResults() {
       time: timesArrays[i],
       id: runnersArrays[i].id,
     });
-    console.log(results);
   }
 
   try {

@@ -6,7 +6,6 @@ export async function getResults() {
     const data = await response.json();
 
     if (!response.ok || data.status !== 'success') {
-      console.log(`Could not get the results. Error: ${data.message}`);
       errorMessageDisplay('Could not get the results', 'error');
       return [];
     }
@@ -21,7 +20,7 @@ export async function getResults() {
 
 export function createCsv(data) {
   if (!data || !data.length) {
-    console.log('no data to convert');
+    errorMessageDisplay('No data to convert', 'error');
     return '';
   }
 

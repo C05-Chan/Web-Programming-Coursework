@@ -97,7 +97,6 @@ export function addTime() {
   localStorage.setItem('times', JSON.stringify(recordedTimes));
 
   errorMessageDisplay('Time recorded successfully!', 'success');
-  console.log('Recorded times:', recordedTimes);
 
   const list = JSON.parse(localStorage.getItem('times'));
 
@@ -140,7 +139,6 @@ export async function submitTimeRecords() {
       return;
     }
 
-    console.log(`Times submitted successfully: ${result}`);
     errorMessageDisplay('Times submitted successfully:', 'success');
     localStorage.setItem('times', JSON.stringify(recordedTimes));
 
@@ -148,7 +146,7 @@ export async function submitTimeRecords() {
     hideElement(document.querySelector('.stopwatch-container'));
     showElement(el.clear_times);
   } catch (error) {
-    console.log(`Error: ${error}`);
+    console.error(`Error: ${error}`);
     errorMessageDisplay('Error submitting times, it is currently stored locally, please try again out of offline mode', 'error');
     localStorage.setItem('server-times', JSON.stringify(recordedTimes));
     localStorage.setItem('server-times-client', clientId);
@@ -172,7 +170,7 @@ export function clearTimes() {
   removeClientID();
 
   document.querySelector('.stopwatch-container').style.display = 'grid';
-  hideElement(el.clearTimes);
+  hideElement(el.clear_times);
 }
 
 export function checkTimesSubmission() {

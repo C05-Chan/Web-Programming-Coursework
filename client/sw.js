@@ -1,5 +1,4 @@
 const CACHE_NAME = 'runpark-cache';
-const API_CACHE = 'api-cache';
 
 self.addEventListener('install', event => {
   event.waitUntil((
@@ -30,21 +29,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (request.url.includes('/get-results')) {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          const responseClone = response.clone();
-          caches.open(API_CACHE).then(cache => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => caches.match(request)),
-    );
-    return;
-  }
-
   event.respondWith(
     fetch(request)
       .then(response => {
@@ -58,6 +42,8 @@ self.addEventListener('fetch', event => {
   );
 });
 
+
+// Rich method - i dont want to cache first //
 // const API_CACHE = 'api-cache';
 // const CACHE = 'hsww';
 
