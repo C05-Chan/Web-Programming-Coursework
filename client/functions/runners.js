@@ -1,12 +1,14 @@
 import { el, errorMessageDisplay, getClientID, getRunners, hideElement, removeClientID, showElement, errorMessageReset } from './common.js';
 
-let recordedRunners = [];
+// Global Variable//
+let recordedRunners = []; // array to hold runners recorded in this session //
 
 export async function addRunner() {
-  el.error_message.textContent = '';
+  // add runners to the list //
+  el.error_message.textContent = ''; // clear any existing error message //
   let targetedRunner = null;
-  const idNumber = el.runner_ID.value;
-  const position = el.runner_position.value;
+  const idNumber = el.runner_ID.value; // get runner ID from input //
+  const position = el.runner_position.value; // get runner position from input //
 
   if (!position || !idNumber) {
     errorMessageDisplay('Please enter both position and ID number', 'error');
@@ -18,33 +20,37 @@ export async function addRunner() {
     return;
   }
 
-  const runnersData = await getRunners();
+  const runnersData = await getRunners(); // fetch all runners data //
 
   for (let i = 0; i < runnersData.length; i++) {
+    // look for the runner with the matching ID
     if (runnersData[i][0] === idNumber && targetedRunner === null) {
       targetedRunner = runnersData[i];
     }
   }
 
-
   if (!targetedRunner) {
+    // if no runner found, show error and exit
     errorMessageDisplay('Runner ID not found', 'error');
     return;
   }
 
-  const runnerName = `${targetedRunner[1]} ${targetedRunner[2]}`;
-  const runnersInfo = { id: idNumber, name: runnerName, position };
 
-  recordedRunners.push(runnersInfo);
-  localStorage.setItem('runners', JSON.stringify(recordedRunners));
+  const runnerName = `${targetedRunner[1]} ${targetedRunner[2]}`; // build runner name //
+  const runnersInfo = { id: idNumber, name: runnerName, position }; // add its to the runner info object //
 
-  const list = JSON.parse(localStorage.getItem('runners'));
-  displayRecordedRunners(list);
+  recordedRunners.push(runnersInfo); // add runner info to local array
+  localStorage.setItem('runners', JSON.stringify(recordedRunners)); // save updated list to local storage //
+
+  const list = JSON.parse(localStorage.getItem('runners')); // get updated list from local storage //
+  displayRecordedRunners(list); // update the displayed list //
 }
 
 export function displayRecordedRunners(list) {
-  el.runners_list.innerHTML = '';
+  // updates the list of recorded runners
+  el.runners_list.innerHTML = ''; // clear current list //
 
+  // add each runner as a new list item at the top //
   for (const runner of list) {
     const listItem = document.createElement('li');
     listItem.textContent = `Position ${runner.position}: ${runner.name} (ID: ${runner.id})`;
@@ -53,7 +59,8 @@ export function displayRecordedRunners(list) {
 }
 
 export async function submitRunnersRecords() {
-  errorMessageReset();
+  // submits recorded runners to the server //
+  errorMessageReset(); // clear any previous error messages //
 
 
   if (recordedRunners.length === 0) {
@@ -61,9 +68,10 @@ export async function submitRunnersRecords() {
     return;
   }
 
-  const clientId = getClientID();
+  const clientId = getClientID(); // get client ID for submission //
 
   try {
+    // send data to server//
     const response = await fetch('/submit-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -72,6 +80,7 @@ export async function submitRunnersRecords() {
 
     const result = await response.json();
 
+
     if (!response.ok) {
       errorMessageDisplay(`Unable to submit time data. Error: ${result.error}`);
       localStorage.setItem('server-runners', JSON.stringify(recordedRunners));
@@ -79,8 +88,10 @@ export async function submitRunnersRecords() {
       return;
     }
 
+
     errorMessageDisplay('Runners submitted successfully:', 'success');
     localStorage.setItem('runners', JSON.stringify(recordedRunners));
+
 
     hideElement(document.querySelector('.runners-input-container'));
     showElement(el.clear_runners);
@@ -90,29 +101,36 @@ export async function submitRunnersRecords() {
     localStorage.setItem('server-runners', JSON.stringify(recordedRunners));
     localStorage.setItem('server-runners-client', clientId);
   }
+  // mark runners as submitted in localStorage //
   localStorage.setItem('submitted-runners', 'true');
 }
 
 export function clearRunners() {
+  // clears recorded runners and resets UI/input fields //
   recordedRunners = [];
   el.runners_list.innerHTML = '';
   localStorage.removeItem('runners');
   localStorage.removeItem('submitted-runners');
   errorMessageReset();
   removeClientID();
+
   el.runner_ID.value = '';
   el.runner_position.value = '';
+
 
   document.querySelector('.runners-input-container').style.display = 'grid';
   hideElement(el.clear_runners);
 }
 
 export function checkRunnersSubmission() {
+  // checks if runners have been submitted previously //
   const isRunnersSubmitted = localStorage.getItem('submitted-runners');
 
   if (isRunnersSubmitted) {
+    // if submitted, hide inputs and show clear button
     hideElement(document.querySelector('.runners-input-container'));
     showElement(el.clear_runners);
+    // display the previously recorded runners
     displayRecordedRunners(JSON.parse(localStorage.getItem('runners')));
   }
 }

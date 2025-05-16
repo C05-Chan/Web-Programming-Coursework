@@ -94,7 +94,7 @@ Here is a breakdown of how AI was used, what kinds of prompts used and a reflect
 **Prompt Used:**
 >What does each status code mean?
 
-At the start, I use AI to clarify what each status code meant and when to use each status code in which scenario. This helped me write the server responses which helped me debug and ensure that my application handled errors and success cases correctly. You can see I have used the status codes in the server for the responses. In that server I had mainly use status (500) as most are server error and  status (200) because they have successfully done the task. There are some status (400) which means there are client errors or a page not found, it little but I had added that in to help with debugging and error handling.
+At the start, I use AI to clarify what each status code meant and when to use each status code in which scenario. This helped me write the server responses which helped me debug and ensure that my application handled errors and success cases correctly. You can see I have used the status codes in the server for the responses. In that server I had mainly use **status (500)** as most are server error and **status (200)** because they have successfully done the task. There are some **status (400)** which means there are client errors or a page not found, it little but I had added that in to help with debugging and error handling.
 
 ### SQlite3 Commands and Their Differences
 **Prompt Used:**
@@ -121,61 +121,48 @@ When I began writing JavaScript, I needed to create a function that could read a
 >how to use js and make a random bunch of numbers and letters like asda12312asdfa
 >is there another way?
 
-I wanted to create a `client id` so that I could get specific data that is stored in the database with it, but i did not know how to generate a string of random letters and numbers together. However, the first response it gave me was not optimal at all, so I asked if there was another way. I took the one line that generates the string and adapted it to my function so it creates what I wanted. I had created the function to generate the `client id` which is found in my `client/functions/common.js`.
+I wanted to generate a client ID to retrieve specific data stored in the database, but I wasn’t sure how to create a string made up of random letters and numbers. I asked ai "how to use js and make a random bunch of numbers and letters like asda12312asdfa" and the method it responded wasn’t ideal, so I asked for an alternative approach. The next response game me a simple to understand and easy code to implement and I used the one-liner that generates a random string and adapted it to fit into my function. This function, which generates the `client ID`, is located in `client/functions/common.js`.
 
-I wanted to generate a client ID to retrieve specific data stored in the database, but I wasn’t sure how to create a string made up of random letters and numbers. I asked ai "how to use js and make a random bunch of numbers and letters like asda12312asdfa" and the method it responded wasn’t ideal, so I asked for an alternative approach. The next response game me a simple to understand and easy code to implement and I used the one-liner that generates a random string and adapted it to fit into my function. This function, which generates the `client ID`, is located in [client/functions/common.js].
-
-
-
-### Local Storage and Session Storage
-For `client id` I wanted to store it in session storage so that I could simulate multiple clients with different tabs. However, the powerpoint provided did not say anything about session storage syntax, so I had ask AI:
-
-**Prompt Used**
->Is local storage and session storage syntax the same?
-
-It had provided me the syntax for both local and session storage and the differences between them. Using this information, I had created the function to generate the `client id` which is found in my `client/functions/common.js`.
 
 ### Import/Export
-When I had add my database to my file and seperated my functions into their own js file, I needed to add `"type": "module"` to allow me to use it but it was causing an error with my server so I asked chatgpt what does `"type": "module"` do and it said it tells Node.js to treat `.js` files as ES modules instead of the default CommonJS modules. Then I realised I would need to change my file paths in my server but I did not know how to do it, so I ask AI to guide me through how to change my old server code to my current one and I followed the guide. The changed code can be found from line 1 - line 23 in `srvr.js`.
-
 **Prompt Used**
 >what does type:module do?
 >`..[code].. guide me step by step to make this work with ES module
 
-### How to Create Buttons
-For the admin page, I wanted to create buttons for each row of data, but I did not know how to format and create two buttons on the side. So I asked AI how to add two buttons to every item in a an array. It had gave me the response and I used the syntax as my base and adapted it to my code from line 107 - line 134 in `/client/functions/admin.js`. It worked very well and I adapted the code so that I can be used for both modify times and runners submission. Also, this helped me develop the checkboxes for the create result pages as i followed the same concept but differently format as one was a list and the other was a table.
+When I added my database and separated my functions into individual JS files, I needed to include `"type": "module"` in my `package.json` to use **ES modules**. However, this caused an error with my server. I asked AI "what does "type": "module" do", and it explained that it tells **Node.js** to treat `.js` files as **ES modules** instead of using the default **CommonJS** format. That’s when I realised I needed to update the file paths in my server code for the file path. Since I wasn’t sure how to do that, I provided AI with the beginning of my old server code and asked it to guide me step by step in converting it. I followed the guidance, and the updated code can now be found from lines 1 to 23 in `srvr.js`.
 
+### How to Create Buttons
 **Prompt Used**
 >if i had an array, how to make it for every item in the array, create two buttons next to it?
 
-### Check By Format
-When an admin modify's the time data, I wanted to check that the time is in the **"HH:MM:SS:MMM"** format but I did not know how so I ask AI and taught me how to use it as well as what `test()` function was and how it check if a string matches a pattern. I used the code provided and adapted the code to be usable for my function. This can be found in`/client/functions/admin.js` Line 154 - Line 158.
+For the admin (modify) page, I wanted to add two buttons next to each row of data, but I wasn’t sure how to create and format them next to th display properly. I asked AI how to add two buttons to every item in an array, and it provided a helpful example. I used the syntax as a starting point and adapted it to my own code, which can be seen from lines 107 to 134 in `/client/functions/admin.js`. It worked really well, and I customised the implementation to handle both modifying times and runner submissions. This experience also helped me later when developing the checkboxes for the "create result" pages, as I applied the same concept—just formatted differently since one used a list and the other a table.
 
+### Check By Format
 **Prompt Used**
 >how to check if the text input is in a 00:00:00:000 format in js and explain
+>what does test() do?
+
+When an admin modify's the time data, I wanted to ensure that the input is following the **"HH:MM:SS:MMM"** format bI wasn’t sure how to implement this validation, so I asked AI for help and taught me how the solution but there was a `test()` in the code that was not clear and i then asked *"what does test() do?"* and it responded that it was a  function was and how it check if a string matches a pattern. I used the code provided and adapted the code to be usable for my function. This can be found in`/client/functions/admin.js` from lines 154 to 158.
 
 ### Adding Header Cell
-When the admin click create button, the function creates a checkbox for each row but there would be no header which affect the css, and understanding of the app, so I used AI to teach me on how to add a header cell and changed it to my cell title. This can be found in `/client/functions/admin.js` line 364 - 380. It was very useful as it allowed me easily code remove the head cell as well using the knowledge I had previously and the knowledge I learnt from the AI. 
-
 **Prompt Used**
 >how to add a header cell js to a table
 
-### Add checkbox
-When the admin click create button, the function creates a checkbox for each row and allows them to select it. I already know how to make a checkbox for each row, but the issue was how I would get the data from the checkboxes. In one of the prompts, it gave me a custom data attribute which i then included to store my data arrays and data type. this can be found on line 393 and line 403 in `/client/functions/admin.js`.
+When the admin click create button, the function creates a checkbox for each row but there would be no header cell for the checkbox column which affect the **CSS**, and understanding of the app as there would be random checkboxes. To fix this, I used AI to teach me "how to add a header cell" With its guidance, I was able to implement the solution, which can be found in /client/functions/admin.js from lines 364 to 380. It was very useful as it had also helped me understand how to remove the header cell later if needed, using both what I already knew and what I learned from AI.
 
+### Add checkbox
 **Prompt Used**
 >I have an array of item  to add a check box for every row and how to use the checkbox and its value? in js
 >and in my array, each item carry more data inside, how do i use it?
 
-This worked very well and the ai helped me understand checkboxes a lot better and help me code it when trying to get all the checked boxes data and merge them to create result.
+When the admin clicks the create button, the function generates a checkbox for each row, allowing them to select entries. I already knew how to create checkboxes for each row from my own research and earlier AI guidance with adding buttons. However, the challenge was figuring out how to retrieve data from the selected checkboxes. In one of the responses, AI suggested using a `custom data-` attribute, which I used to store the relevant data arrays and data type. This implementation can be found on lines 393 and 403 in `/client/functions/admin.js.` This approach worked very well, and it helped me better understand how checkboxes function. It also made it much easier to collect all the selected data and merge it later to create a result.
 
 
 ### Explain code
-For users downloading csv file, I had found a easier to understand version on a website but want to ensure I had complete understanding so I asked AI to explain it further. Then I wrote the code whilst following a similar structure of the code online. You can find this code in `client/functions/results.js` line 22 - line 52; It works very well as it made it very easy to understand and when there was an error, it was a simple fix as I knew exactly how it worked with my code.
-
 **Prompt Used**
 >..[code].. explain
 
+To load a CSV file of runner results, I found a simple and easy-to-understand example on a website. However, I wanted to make sure I fully understood how it worked, so I asked AI to explain it in more detail. After gaining a better understanding, I wrote my own code following a similar structure to the example I found. This implementation can be seen in `client/functions/results.js` from lines 22 to 52. It works very well, as the clear structure made the logic easy to follow, and when errors occurred, they were simple to fix since I knew exactly how the code operated.
 
 ### Offline/ Ping Server
 I wanted to make a feature so that when the users are offline, the local storage data will be kept locally UNTIL they get back online. Once they are online I wanted to be able to automatically sync the data to the server. Since I knew how to code how to send stuff to the server, the automatically syncing would not be the hard part but rather check if the internet connection was on and if the server was reachable.
@@ -194,10 +181,10 @@ However, I did encounter a problem with my localStorageData as it will automatic
 >if !navigator.online  returns true does that mean the browser/wifi AND server is offline?
 
 ### Window Reload
-I wanted to include a feature where the window would automatically reload every couple minutes, so I asked AI "how to make the window reload js?" since I know I could add `setInterval` and make it automatic. When I started implementing it, I encountered and issues where the window will reset to the information page. So then I added pages to be assigned to session storage, so that when on reload it will not disappear, but due to the way the app had been coded to hide and show elements, when the window reset on a "page" like **"Timer"** or **"Submission"** the elements will all disappear. So I decided to not use that idea and instead make a reload button on specific pages like **"Runners"** and **"Admins"** so they can refresh to get the data.
-
+**Prompt Used**
 >how to make the window reload js?
 
+I wanted to include a feature where the window would automatically reload every couple minutes, so I asked AI "how to make the window reload js?" since I know I could add `setInterval` and make it automatic. When I started implementing it, I encountered and issues where the window will reset to the information page. So then I added pages to be assigned to session storage, so that when on reload it will not disappear, but due to the way the app had been coded to hide and show elements, when the window reset on a "page" like **"Timer"** or **"Submission"** the elements will all disappear. So I decided to not use that idea and instead make a reload button on specific pages like **"Runners"** and **"Admins"** so they can refresh to get the data.
 
 ### All Prompts Used
 ```What does each status code mean?```
@@ -221,3 +208,4 @@ I wanted to include a feature where the window would automatically reload every 
 ```so how does that differ from navigator.online?```
 ```explain each step?```
 ```if !navigator.online  returns true does that mean the browser/wifi AND server is offline?```
+```how to make the window reload js?```

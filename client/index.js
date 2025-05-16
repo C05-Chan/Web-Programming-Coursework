@@ -1,8 +1,8 @@
 import { el, showElement, hideElement, clearContent, errorMessageReset, errorMessageDisplay } from './functions/common.js';
-import { adminBtn, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners, createResult, generateResults } from './functions/admin.js';
+import { admin, editTimesList, addNewTime, popupTimeDone, popupTimeCancel, saveNewTimes, editRunnersList, addNewRunner, popupRunnerDone, popupRunnersCancel, saveNewRunners, createResult, generateResults } from './functions/admin.js';
 import { startTimer, stopTimer, resumeTimer, resetTimer, addTime, submitTimeRecords, clearTimes, displayRecordedTimes, checkTimesSubmission } from './functions/timer.js';
 import { addRunner, submitRunnersRecords, clearRunners, displayRecordedRunners, checkRunnersSubmission } from './functions/runners.js';
-import { createCsv, downloadCsv, runnersResultsBtn, getResults } from './functions/results.js';
+import { createCsv, downloadCsv, runnerResultView, getResults } from './functions/results.js';
 
 function handleNavChange() {
   const selected = el.nav_dropdown.value;
@@ -17,13 +17,13 @@ function handleNavChange() {
     clearContent();
     hideElement(el.volunteer_nav);
     hideElement(el.create_results);
-    runnersResultsBtn();
+    runnerResultView();
     hideElement(el.manage_back);
   } else if (selected === 'admin-view') {
     clearContent();
     showElement(el.admin_container);
     hideElement(el.volunteer_nav);
-    adminBtn();
+    admin();
     hideElement(el.manage_back);
   } else if (selected === 'volunteer-view') {
     clearContent();
@@ -57,7 +57,7 @@ el.cancel_create_results.addEventListener('click', () => {
   showElement(el.initial_message);
   hideElement(el.create_message);
   errorMessageReset();
-  adminBtn();
+  admin();
 });
 
 el.manage_back.addEventListener('click', () => {
@@ -71,7 +71,7 @@ el.manage_back.addEventListener('click', () => {
 
   showElement(el.modify_runners);
   showElement(el.modify_times);
-  adminBtn();
+  admin();
 });
 
 el.modify_times.addEventListener('click', () => {
@@ -296,9 +296,3 @@ window.addEventListener('load', () => {
     handleNavChange();
   }
 });
-
-// DON NOT ADD THIS! //
-
-// setInterval(function () {
-//   window.location.reload();
-// }, 10000);
