@@ -14,7 +14,8 @@
   "scripts": {
     "test": "node --watch srvr.js",
     "start": "node srvr.js",
-    "setup": "npm install express sqlite sqlite3"
+    "setup": "npm install express sqlite sqlite3",
+    "config": ""
   },
   "repository": {
     "type": "git",

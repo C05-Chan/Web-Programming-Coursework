@@ -115,6 +115,7 @@ async function getResults(req, res) {
 
 async function testClear() {
   await db.clearDBData('race_data');
+  await db.clearDBData('race_results');
 }
 
 testClear();
